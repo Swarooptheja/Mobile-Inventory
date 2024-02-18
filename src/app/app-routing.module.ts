@@ -6,10 +6,35 @@ const routes: Routes = [
     path: 'home',
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
   },
+  // {
+  //   path: '',
+  //   redirectTo: 'home',
+  //   pathMatch: 'full'
+  // },
+  {
+    path: 'login',
+    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+  },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full'
+  },
+  {
+    path: 'all-user-organization-list',
+    loadChildren: () => import('./pages/all-user-organization-list/all-user-organization-list/all-user-organization-list.module').then( m => m.AllUserOrganizationListPageModule)
+  },
+  {
+    path: 'activity',
+    loadChildren: () => import('./pages/activity/activity.module').then( m => m.ActivityPageModule)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./pages/Dashboard/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+  },
+  {
+    path: 'goods-receipt-po-list',
+    loadChildren: () => import('./pages/goods-receipt-po-list/goods-receipt-po-list.module').then( m => m.GoodsReceiptPoListPageModule)
   },
 ];
 

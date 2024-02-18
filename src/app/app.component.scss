@@ -1,0 +1,105 @@
+.custom-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   
+  }
+ 
+  .custom-title {
+    margin: 0 auto;
+  }
+ 
+  .menu-button {
+    --background: white;
+    color: black;
+    --box-shadow: none;
+  }
+ 
+  .titles-card {
+    box-shadow: 0px 1px 4px 0px #878787;
+    border-radius: 8px;
+    height: 175px;
+    width: 100%;
+  }
+ 
+  page-dashboard {
+    .subtitle-style {
+      color: #aaa;
+      margin-left: -1px;
+    }
+    .card-ios {
+      margin: -1px;
+      border-radius: 10px;
+      width: calc(100% - -3px);
+      font-size: 1.4rem;
+      background: #fff;
+      -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      box-shadow: 1pt 1pt 4pt 0.5pt rgb(208, 208, 208);
+      height: 175px;
+    }
+    .header-style {
+      text-align: left;
+    }
+    .card-ios h4 {
+      margin: 2px 0;
+      font-size: 18px !important;
+      font-weight: 580;
+      color: #323030 !important;
+    }
+    .grid {
+      margin-top: 5px;
+      padding: 4px;
+    }
+    ion-card img {
+      display: unset;
+    }
+    .card-ios h4 {
+      margin: 2px 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: rgb(50, 48, 48) !important;
+    }
+    .chart {
+      width: var(--size);
+      height: var(--size);
+      margin: 10px auto;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chart::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: calc(100% - var(--bord));
+      height: calc(100% - var(--bord));
+      background: white;
+      border-radius: inherit;
+    }
+    .offset-bottom-20{
+      margin-bottom: 20px;
+    }
+    .titles-card {
+      box-shadow: 0px 1px 4px 0px #878787;
+      border-radius: 8px;
+      height: 175px;
+      width: 100%;
+    }
+    .large-font {
+      font-size: 26px;
+    }
+    .logout-icon {
+      font-size: 40px;
+      color: #005e81;
+    }
+    .large-font {
+      font-size: 26px;
+    }
+    .container{
+      border:1px solid red
+    }
+  }

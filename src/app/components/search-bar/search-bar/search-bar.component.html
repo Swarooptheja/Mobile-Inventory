@@ -1,0 +1,5 @@
+<ion-row class="search-content">
+	<ion-searchbar icon-left [placeholder]=placeHolder (ionInput)="getItems($event)" [(ngModel)]='searchText'
+		(ionClear)="clearsearch()">
+	</ion-searchbar>
+</ion-row>

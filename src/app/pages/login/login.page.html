@@ -1,0 +1,29 @@
+<ion-content [fullscreen]="true">
+  <div>
+    <h2 id="login_heading">Mobile Supply Chain</h2>
+  </div>
+
+  <!-- Login Page Start -->
+  <form>
+    <ion-row class="center-login-page">
+      <ion-col col-12 class="column">
+        <ion-icon name="person" col-2></ion-icon>
+        <input type="text" class="input" placeholder="Username" name="username" [(ngModel)]="account.username" col-10>
+      </ion-col>
+      <ion-col col-12 class="column">
+        <ion-icon name="lock-closed" col-2></ion-icon>
+        <input [type]="showPassword ?'text' :'password'"  class="input" placeholder="Password" name="password" [(ngModel)]="account.password" col-8>
+        <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="eye" (click)="passwordVisibility()" col-2></ion-icon>
+      </ion-col>
+      <ion-col col-12 class="column">
+        <input type="submit" class="submit" (click)="login()" value="Login" />
+      </ion-col>
+    </ion-row>
+  </form>
+  <div class="bg_image">
+    <div>
+      <img alt="Client Logo" class="image" src='../../../assets/icon/bg.png'/>
+    </div>
+  </div>
+ 
+</ion-content>

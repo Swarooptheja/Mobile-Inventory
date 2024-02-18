@@ -1,0 +1,23 @@
+<ion-header >
+  <app-header [heading]="heading" [isBack]="isBack"(onNavigateBack)="goBackToPreviousPage()">
+
+
+  </app-header>
+</ion-header>
+<ion-content #ionContent>
+ 
+
+  <ion-card class="slide-in-from-right" *ngFor="let card of resultArray  " animation>
+ 
+    <ion-card-content>
+      <ion-spinner *ngIf="card.status === 'loading'"></ion-spinner>
+      <ion-icon name="checkmark" color="success" *ngIf="card.status === 'checkmark-circle'"></ion-icon>
+      <ion-label>{{ card.message }}</ion-label>
+      <ion-icon name="close-circle" color="danger" *ngIf="card.status === 'close-circle'"></ion-icon>
+    </ion-card-content>
+  </ion-card>
+ 
+  <div>
+    <ion-button *ngIf="displaySyncAgain"(click)="syncAgain()" class="submit">Sync Again</ion-button>
+  </div>
+</ion-content>

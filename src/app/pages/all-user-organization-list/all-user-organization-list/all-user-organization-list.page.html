@@ -1,0 +1,36 @@
+<ion-header class="hearder-top">
+  <app-header [heading]="heading" (onNavigateBack)="goBackToPreviousPage()">
+
+  </app-header>
+  
+</ion-header> 
+<app-search-bar [searchText]="searchText" (clearItems)="clearSerchItem()"(searchItems)="getsearchItems($event)"></app-search-bar>
+
+
+
+
+<ion-content #content class="list-page-content">
+  <div class="list-page-content-org" *ngFor="let item of organizationList | filter:searchText index as i" (click)="selectOrg(item)">
+    <div style="display: flex; gap: 40px;">
+      <div class="list-page-content-icon"> <ion-icon *ngIf="item.checked || selectedOrgCode === item.InventoryOrgCode" name="checkmark-circle" class="icon-inner" size="large">
+        </ion-icon></div>
+
+      <ion-col col-5>
+        <h2>{{item.InventoryOrgCode}}</h2>
+      </ion-col>
+    </div>
+    <div>
+      <ion-col col-11>
+        <p style="font-size: 1.2rem;">{{item.InventoryOrgName}}</p>
+      </ion-col>
+    </div>
+  </div>
+</ion-content>
+
+<!-- <ion-footer> -->
+<div text-center>
+  <button class="po-item-btn" (click)="confirmOrganization()">
+    Confirm
+  </button>
+</div>
+<!-- </ion-footer> -->

@@ -1,0 +1,82 @@
+ion-header {
+    background-color: #08668d;
+  } 
+  .title-bar {
+    color: #fff;
+    background: #08668d;
+  }
+   
+  /* Animation for slide in */
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+   
+  /* Animation for sliding in from the right */
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+   
+  /* Component-specific styles */
+  .slideIn {
+    animation: slide-in 500ms ease-in-out forwards;
+  }
+   
+  .slide-in-from-right {
+    animation: slideInFromRight 0.5s ease-in-out;
+  }
+   
+  /* Styling for cards */
+  .new-border {
+    border: 2px solid rgb(230, 221, 221);
+    background: rgba(255, 255, 255, 0.075);
+    width: 95%; /* Adjust the width as needed */
+  }
+   
+  /* Styling for icons */
+  .icon-position {
+    margin: auto 0;
+    width: 20%;
+  }
+   
+  /* Styling for content box */
+  .main-box {
+    width: 80%;
+  }
+   
+  /* Styling for success messages */
+  .success {
+    color: #8c8e91;
+    font-size: 16px;
+    width: 100%;
+  }
+   
+  /* Styling for card content */
+  .card-content {
+    height: 70px; /* Adjust the height as needed */
+    overflow: hidden;
+  }
+
+  .submit{
+    font-size: 18px;
+    margin: 8px;
+    border: 2px solid #08668d !important;
+    border-radius: 2rem;
+    width:85%;
+    padding: 8px;
+    color: #fff ;
+    background: #08668d;
+    font-weight: bold;
+    outline:none !important;
+}

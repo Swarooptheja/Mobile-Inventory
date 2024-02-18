@@ -1,0 +1,24 @@
+
+<ion-row class="navcontainer navbar"><ion-buttons>
+    <button *ngIf="isBack" ion-button icon-only (click)="navigateBack()">
+      <ion-icon size="large" name="arrow-back-outline"></ion-icon>
+    </button>
+    <button *ngIf="isHome" ion-button icon-only>
+      <ion-icon size="large" name="home"></ion-icon>
+    </button>
+    <button *ngIf="isMenu" ion-button icon-only>
+      <ion-menu-button menu="main-menu"></ion-menu-button>
+      <!-- <ion-icon name="reorder-three" size="large"></ion-icon> -->
+    </button>
+    
+  </ion-buttons>
+  <ion-col class="navcontainer_leftside">
+
+    <ion-title>
+      <div>
+        {{heading}}
+      </div>
+    </ion-title>
+  </ion-col>
+
+</ion-row>
