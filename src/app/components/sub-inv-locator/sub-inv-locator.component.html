@@ -1,0 +1,34 @@
+<ion-list>
+  <ion-item class="border-bottom-grey">
+    <ion-col>
+      <ion-row class="row-alignment">
+        <ion-col col-4 class="text-overflow  ">
+          SubInv:
+        </ion-col>
+        <ion-col col-4 ion-item>
+          <ion-input class="min-serial-input input-box" type="text" [placeholder]="'Select SubInv'"
+            [(ngModel)]="subInventoryCode"></ion-input>
+        </ion-col>
+        <ion-col col-4 (click)="subInventoryModal()">
+          <ion-icon name="chevron-forward-outline" size="large"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-item>
+  <ion-item>
+    <ion-col>
+      <ion-row class="row-alignment">
+        <ion-col col-4 class="text-overflow  ">
+          Loc:
+        </ion-col>
+        <ion-col col-4 ion-item>
+          <ion-input class="min-serial-input input-box" type="text" [placeholder]="'Select Loc'"
+            [(ngModel)]="locator"></ion-input>
+        </ion-col>
+        <ion-col col-4 (click)="locatorModal()">
+          <ion-icon name="chevron-forward-outline" size="large"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-item>
+</ion-list>

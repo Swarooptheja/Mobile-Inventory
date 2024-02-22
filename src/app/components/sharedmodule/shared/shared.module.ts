@@ -5,12 +5,14 @@ import {HeaderComponent} from '../../header/header.component'
 import { IonicModule } from '@ionic/angular';
 import { SearchBarComponent } from '../../search-bar/search-bar/search-bar.component';
 import { FormsModule } from '@angular/forms';
+import { SubInvLocatorComponent } from '../../sub-inv-locator/sub-inv-locator.component';
 
 
 @NgModule({
   declarations: [
    HeaderComponent,
-   SearchBarComponent
+   SearchBarComponent,
+   SubInvLocatorComponent
   ],
   imports: [
     CommonModule,
@@ -20,6 +22,7 @@ import { FormsModule } from '@angular/forms';
   exports:[
     HeaderComponent,
     SearchBarComponent,
+    SubInvLocatorComponent
   ]
 })
 export class SharedModule { }

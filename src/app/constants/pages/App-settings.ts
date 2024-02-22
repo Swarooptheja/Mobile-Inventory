@@ -73,6 +73,10 @@ export const Appsettings = {
     get getOnhnadTableTypeUrl() {
         return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getOnhnadTableType`;
     },
+    get getLotsTableType() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getLotsTableType` },
+    get serialTableTypeUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getSerialTableType`},
+    get getLocatorsUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_20D}getLocators` },
+
 
 
     // Config APIs
@@ -83,6 +87,9 @@ export const Appsettings = {
 
     //GoodsReceipt API's
     get goodsReceiptUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_20D}getDocumentsForReceiving` },
+
+    get createGoodsReceiptTransactionsUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_20D}createGoodsReceiptTransactions`},
+
 
 
 
@@ -310,6 +317,9 @@ export const ERROR_MESSAGE = {
     PLEASE_CHECK_YOUR_INTERNET_CONNECTION:
         'Please Check your internet connection',
     PLEASE_SELECT_ORGANIZATION: 'Please select organization',
+    LESS_QUANTITY: 'Please provide a quantity it should be less than Qty remaining',
+    INVALID_SCAN: 'Invalid Scan',
+    PLEASE_SELECT_SUBINV:'Please select subinventory'
 };
 
 export const MESSAGE = {
@@ -405,15 +415,47 @@ export const ROUTE_PATHS={
     ALL_USER_ORGANIZATION_LIST: 'all-user-organization-list',
     ACTIVITY: 'activity',
     GOODS_RECEIPT_PO_LIST_PAGE:'goods-receipt-po-list',
-    DASH_BOARD: 'dashboard'
+    DASH_BOARD: 'dashboard',
+    GOODS_RECEIPT_ITEMS_PAGE:'goods-receipt-items',
+    GOODS_RECEIPT_ITEM_DETAILS_PAGE:'goods-receipt-item-details',
+    COMMON_MODEL: 'common-model'
 };
 
 export const CONSTANTS = {
     LAST_SYNC_TIME:'LAST_SYNC_TIME',
+    queryLimitSize:50
 }
 export const QUERIES = {
-    GOODS_RECEIPT : {
+    GOODS_RECEIPT: {
         GET_PURCHASE_ORDERS_LIST: `SELECT *, COUNT(PoHeaderId) as ItemsCount, SUM(QtyRemaining <= 0) as FullyReceivedCount
         FROM ${TABLE_NAME.GOODS_RECEIPT_DOCS_RECEIVING} GROUP BY PoHeaderId, PoReleaseId, ShipmentHeaderId, RMANumber`,
+        GET_PURCHASE_ORDER_ITEMS: `SELECT * FROM ${TABLE_NAME.GOODS_RECEIPT_DOCS_RECEIVING} WHERE PoHeaderId = ? and PoReleaseId = ? and ShipmentHeaderId = ? and RMANumber = ? 
+        ORDER BY PoLineNumber, ShipmentNumber ASC`,
+        GET_PURCHASE_ORDERS_LIST_WITH_LIMIT: `SELECT *, COUNT(PoHeaderId) as ItemsCount, SUM(QtyRemaining <= 0) as FullyReceivedCount
+        FROM ${TABLE_NAME.GOODS_RECEIPT_DOCS_RECEIVING} WHERE PoNumber LIKE ? OR ShipmentNumber LIKE ? OR RMANumber LIKE ? OR VendorName LIKE ? OR SourceTypeCode LIKE? OR Requestor LIKE? GROUP BY PoHeaderId, PoReleaseId, ShipmentHeaderId, RMANumber LIMIT ${CONSTANTS.queryLimitSize} OFFSET ?`,
+    },
+
+    RESTRICTED_SUBINVENTORY: {
+        GET: `SELECT * FROM ${TABLE_NAME.RESTRICTED_SUBINVENTORY} WHERE InventoryOrgId = ? AND ItemNumber = ? ORDER BY SubInventoryCode ASC`,
+        GET_BY_SUBINV_CODE: `SELECT * FROM ${TABLE_NAME.RESTRICTED_SUBINVENTORY} WHERE InventoryOrgId = ? AND SubInventoryCode = ?`
+    },
+    RESTRICTED_LOCATOR: {
+        GET: `SELECT * FROM ${TABLE_NAME.RESTRICTED_LOCATORS} WHERE Locator = ?`,
+        GET_BY_LOCATOR_AND_SUBINV_CODE_AND_ITEM_NO: `SELECT * FROM ${TABLE_NAME.RESTRICTED_LOCATORS} WHERE InventoryOrgId = ? AND Locator = ? AND SubInventoryCode = ? AND ItemNumber = ?`,
+
+      },
+    SUBINVENTORY: {
+        GET:`SELECT * FROM ${TABLE_NAME.SUBINVENTORY} WHERE InventoryOrgId = ?`
+    },
+    LOCATOR: {
+        GET:`SELECT * FROM ${TABLE_NAME.LOCATORS} WHERE SubInventoryCode = ?`
     }
-}
+
+};
+
+export enum LOCATOR_TYPE_CODE {
+    NO_LOCATOR = 1,
+    PREDEFINED_LOCATOR = 2,
+    DYNAMIC_ENTRY_LOCATOR = 3
+  }
+

@@ -18,7 +18,7 @@ export class ConfigApiDataService {
       { presentApi: this.getGLPeriods(this.isDeltaSync), apimessage: API_CALLS_MESSAGES.gl_periods },
       { presentApi: this.getReasons(this.isDeltaSync), apimessage: API_CALLS_MESSAGES.reason },
       { presentApi: this.getInventoryPeriods(this.isDeltaSync), apimessage: API_CALLS_MESSAGES.inventory_periods },
-      { presentApi: this.getPurchasingPeriods(this.isDeltaSync), apimessage: API_CALLS_MESSAGES.purchasing_periods },
+      // { presentApi: this.getPurchasingPeriods(this.isDeltaSync), apimessage: API_CALLS_MESSAGES.purchasing_periods },
 
       // this.getGLPeriods(isDeltaSync),
       // this.getInventoryPeriods(isDeltaSync),

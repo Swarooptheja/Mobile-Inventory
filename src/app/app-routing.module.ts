@@ -36,6 +36,18 @@ const routes: Routes = [
     path: 'goods-receipt-po-list',
     loadChildren: () => import('./pages/goods-receipt-po-list/goods-receipt-po-list.module').then( m => m.GoodsReceiptPoListPageModule)
   },
+  {
+    path: 'goods-receipt-items',
+    loadChildren: () => import('./pages/goods-receipt-items/goods-receipt-items.module').then( m => m.GoodsReceiptItemsPageModule)
+  },
+  {
+    path: 'goods-receipt-item-details',
+    loadChildren: () => import('./pages/goods-receipt-item-details/goods-receipt-item-details.module').then( m => m.GoodsReceiptItemDetailsPageModule)
+  },
+  {
+    path: 'common-model',
+    loadChildren: () => import('./components/common-model/common-model.module').then( m => m.CommonModelPageModule)
+  },
 ];
 
 @NgModule({

@@ -4,7 +4,7 @@
   </app-header>
   
 </ion-header> 
-<app-search-bar [searchText]="searchText" (clearItems)="clearSerchItem()"(searchItems)="getsearchItems($event)"></app-search-bar>
+<app-search-bar [placeHolder]="'Search Organizations'" [searchText]="searchText" (clearItems)="clearSearchItem()"(searchItems)="getsearchItems($event)"></app-search-bar>
 
 
 

@@ -4,6 +4,10 @@ import { OfflineDataService } from './providers/offline/offline-data.service';
 import { NavController,IonMenu, AlertController } from '@ionic/angular';
 import { UiProviderService } from './providers/ui/ui-provider.service';
 import { MESSAGE, ROUTE_PATHS } from './constants/pages/App-settings';
+import { register } from 'swiper/element/bundle';
+import { GlobalvariablesService } from './providers/globalvariables/globalvariables.service';
+
+register();
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -18,20 +22,26 @@ export class AppComponent {
     private offlineDataService: OfflineDataService,
     private navCtrl: NavController,
     private uiProvider: UiProviderService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private glovar: GlobalvariablesService
   ) {
-
+    
   }
   async ngOnInit() {
     await this.storage.create();
   }
+
+  ngOnchages () {
+    this.username = this.glovar.getUsername()
+    this.inventoryOrgCode = this.glovar.getOrganisationname();
+  }
   ionViewWillEnter() {
-    this.storage.get('username').then((username) => {
-      this.username = username;
-    });
-    this.storage.get('inventoryOrgCode').then((orgCode) => {
-      this.inventoryOrgCode = orgCode;
-    })
+   this.username = this.glovar.getUsername()
+   this.inventoryOrgCode = this.glovar.getOrganisationname();
+  };
+  ionViewDidEnter() {
+    this.username = this.glovar.getUsername()
+    this.inventoryOrgCode = this.glovar.getOrganisationname();
   }
   changeOrg() {
     this.uiProvider.showConfirmation(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST, MESSAGE.ORGANIZATIONS_PAGE, this.menu);

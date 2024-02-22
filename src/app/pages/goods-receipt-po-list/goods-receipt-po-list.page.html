@@ -1,46 +1,62 @@
 <ion-header>
-  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()" ></app-header>
+  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()"></app-header>
 </ion-header>
-<app-search-bar [searchText]="searchText" [placeHolder]="'Search for PO'" (clearItems)="clearSerchItem()" (searchItems)="getsearchItems($event)"></app-search-bar>
+<div>
+</div>
+<ion-content>
+  <app-search-bar [searchText]="searchText" [placeHolder]="'Search for PO'" (clearItems)="clearSearchItem()"
+    (searchItems)="getsearchItems($event)"></app-search-bar>
+  <cdk-virtual-scroll-viewport itemSize="56">
+    <ion-card *cdkVirtualFor="let receiptPurchaseOrderItem of goodsReceiptList | filter:searchText">
 
- <ion-content [fullscreen]="true">
-  <cdk-virtual-scroll-viewport>
-  <ion-card *cdkVirtualFor="let value of goodsReceiptList | filter:searchText " (click)="goToDetailsPage(value)">
- 
-    <ion-card-content>
-      <ion-row>
-        <ion-col size="3" class="blue-background">
-          <ion-label class="PoNumber-label">{{value.PoNumber}}</ion-label>
-        </ion-col>
-        <ion-col size="5" class="PoType-label">
-          <ion-label>{{value.PoType}}</ion-label>
-        </ion-col>
-        <ion-col size="1">
-          <ion-label>1 </ion-label>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col class="description-col">
-          <ion-label>
-            {{value.ItemDesc}}
-          </ion-label>
-        </ion-col>
-      </ion-row>
-      <ion-row class="custom-row">
-        <ion-col size="6" class="LastUpdateDate-col">
-          <!-- <ion-label>{{ formatDate(value.LastUpdateDate) }}</ion-label> -->
-        </ion-col>
-        <ion-col size="4" class="Requestor">
-          <ion-label>{{value.Requestor}}</ion-label>
-        </ion-col>
- 
-      </ion-row>
-    </ion-card-content>
-  </ion-card>
-</cdk-virtual-scroll-viewport>
-<ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
-  <ion-infinite-scroll-content></ion-infinite-scroll-content>
-</ion-infinite-scroll>
+      <ion-card-content>
+        <ion-row>
+          <ion-col size="3" class="blue-background">
+            <ion-button class="PoNumber-label">{{receiptPurchaseOrderItem.PoNumber}}</ion-button>
+          </ion-col>
+          <ion-col size="5" class="PoType-label">
+            <ion-label><strong>{{receiptPurchaseOrderItem.PoType}}</strong></ion-label>
+          </ion-col>
+          <ion-col size="1">
+            <ion-label>{{receiptPurchaseOrderItem.ShipmentNumber}} </ion-label>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="10" class="description-col">
+            <ion-label>
+              <strong>
+                {{receiptPurchaseOrderItem.ItemDesc}}
+              </strong>
+            </ion-label>
+          </ion-col>
+          <ion-col size="2">
+            <ion-icon size="large" class="forward" name="arrow-forward"(click)="goToGoodsItemsPage(receiptPurchaseOrderItem)"></ion-icon>
+          </ion-col>
+        </ion-row>
+        <ion-row class="custom-row">
+          <ion-col size="6" class="LastUpdateDate-col">
+            <ion-label>
+              <strong>
+                {{receiptPurchaseOrderItem.LastUpdateDate.split(' ')[0]}}
+              </strong>
+             </ion-label>
+          </ion-col>
+          <ion-col size="4" class="Requestor">
+            <ion-label>
+              <strong>
+                {{receiptPurchaseOrderItem.Requestor}}
+              </strong>
+            </ion-label>
+          </ion-col>
+
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+  </cdk-virtual-scroll-viewport>
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content *ngIf="isEnableInfiniteScroll" loadingText="Please wait..."
+      loadingSpinner="bubbles"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
   <!-- <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll> -->

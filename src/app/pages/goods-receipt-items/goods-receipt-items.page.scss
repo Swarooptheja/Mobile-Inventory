@@ -1,0 +1,61 @@
+ion-header {
+    background-color: #08668d;
+  }
+
+  ion-toolbar {
+    --background: #08668d;
+    /* Set background color */
+    color: white;
+    /* Set text color to white */
+}
+.home{
+    color: #ffff;
+}
+.separator {
+    border-top: 1px solid #ccc; /* Adjust color and thickness as needed */
+    margin-top: 10px; /* Adjust margin as needed */
+    margin-bottom: 10px; /* Adjust margin as needed */
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // height: 100%;
+  }
+ 
+  .square-input {
+    // width: 200px; /* Adjust the width as needed */
+    // height: 200px; /* Set the height to the same value as width to make it a square */
+    border-radius: 10px; /* Adjust border radius as needed */
+    border: 1px solid #000;
+    // display: flex;
+    // justify-content: center;
+    // align-items: center;
+    // background-color: #f0f0f0; /* Background color */
+  }
+ 
+  ion-input {
+    width: 80%; /* Adjust the width of the input box */
+  }
+  .forward {
+    margin-top: 80px;
+  }
+  .items-details ion-item{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: -15px;
+  }
+  .sticky-content {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Adjust background color as needed */
+    z-index: 99; /* Ensure it stays above other elements */
+    padding: 10px; /* Add padding for spacing */
+  }
+  .remaining-content {
+   z-index: 1;
+  }
+
+  .searchitem{
+    margin-left: 10px;
+  }

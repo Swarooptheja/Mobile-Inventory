@@ -1,0 +1,72 @@
+<ion-header>
+  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()"></app-header>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <swiper-container #swiper class="swiper_container" (swiperslidechange)="onSlideChange()">
+    <swiper-slide class="items-details" *ngFor="let purchaseOrderItem of receiptPurchaseOrderItems let i=index">
+      <ion-col size="10">
+        <ion-item class="item-content" lines="none">{{purchaseOrderItem.ItemNumber}}</ion-item>
+        <ion-item class="item-content" lines="none">{{purchaseOrderItem.ItemDesc}}</ion-item>
+        <div class="separator"></div>
+        <ion-item class="item-content" lines="none"> QtyOrdered: {{ purchaseOrderItem.QtyOrdered }} {{
+          purchaseOrderItem.ItemUom }}</ion-item>
+        <ion-item col-6>QtyRemaining: {{ purchaseOrderItem.QtyRemaining }} {{ purchaseOrderItem.ItemUom }}</ion-item>
+        <ion-item class="item-content" lines="none">Shipment No: {{purchaseOrderItem.PoShipmentNumber}}</ion-item>
+        <div class="separator"></div>
+        <ion-row>
+          <!-- <ion-item lines="none">Qty Receiving: -->
+          <!-- TODO ADD THE ION-INPUT -->
+          <!-- <ion-input [(ngModel)]="qtyReceiving" type="number" inputmode="numeric"></ion-input> -->
+          <!-- </ion-item> -->
+
+        </ion-row>
+        <div class="separator"></div>
+        <!-- It will display based on destination if it is a receiving we should display only Qty and it is a Inventory we should 
+          display Qty, Subinventory, Locator, Serials, lots
+         -->
+        <div [ngSwitch]="destination">
+          <div *ngSwitchCase="'Receiving'">
+            <ion-row class="qtyreceiving">
+              <ion-col col-5>
+                Qty Receiving :
+              </ion-col>
+              <ion-col col-4 ion-item>
+                <ion-input class="quantity-detail" type="tel" placeholder="QTY" [(ngModel)]="purchaseOrderItem.QTY"
+                  (ionChange)="goToKeypad($event)"></ion-input>
+              </ion-col>
+              <ion-col col-3>
+                <strong>{{purchaseOrderItem.ItemUom}}</strong>
+              </ion-col>
+            </ion-row>
+          </div>
+          <div *ngSwitchCase="'Inventory'">
+            <ion-row class="qtyreceiving">
+              <ion-col col-5>
+                Qty Receiving :
+              </ion-col>
+              <ion-col col-4 ion-item>
+                <ion-input class="quantity-detail" type="tel" placeholder="QTY" [(ngModel)]="purchaseOrderItem.QTY"
+                  (ionChange)="goToKeypad($event)"></ion-input>
+              </ion-col>
+              <ion-col col-3>
+                <strong>{{purchaseOrderItem.ItemUom}}</strong>
+              </ion-col>
+            </ion-row>     
+            <ion-row>
+              <app-sub-inv-locator *ngIf="purchaseOrderItem && purchaseOrderItem.ItemNumber && i == index" [poItem]="purchaseOrderItem">
+              </app-sub-inv-locator>
+            </ion-row>
+          </div>
+
+        </div>
+        <div class="separator"></div>
+      </ion-col>
+    </swiper-slide>
+  </swiper-container>
+  <ion-col color="#08668d">
+
+    <ion-button class="save-button">SAVE+NEXT</ion-button>
+  </ion-col>
+</ion-content>

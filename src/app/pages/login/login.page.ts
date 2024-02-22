@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Appsettings, ERROR_MESSAGE, MESSAGE } from 'src/app/constants/pages/App-settings';
+import { Appsettings, ERROR_MESSAGE, MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { AlertsService } from 'src/app/providers/alerts/alerts.service';
 import { BodyParamsService } from 'src/app/providers/body-params/body-params.service';
 import { NetworkproviderService } from 'src/app/providers/network/networkprovider.service';
@@ -95,6 +95,7 @@ export class LoginPage implements OnInit {
           this.storage.set('userDetails',loginResult);
           this.storage.set('username', this.account.username);
           this.storage.set('password', this.account.password);
+          this.globalvar.setUsername(this.account.username)
           this.uiProvider.dismissLoader();
           if (this.savecred == true) {
             this.storage.set('savecredentials', true);
@@ -104,7 +105,7 @@ export class LoginPage implements OnInit {
           if (!JSON.parse(this.globalvar.getAllUserOrganization())) {
             this.storage.get('userDetails').then((userDetails) => {
               this.uiProvider.showSuccess(MESSAGE.LOGIN_SUCCESS);
-              this.navCtrl.navigateForward('all-user-organization-list',{ queryParams: userDetails })
+              this.navCtrl.navigateForward(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST,{ queryParams: userDetails })
             });
           } else{
 

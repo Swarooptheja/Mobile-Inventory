@@ -253,6 +253,17 @@ export class OfflineDataService {
       throw error;
     }
   }
+  async executeQueryWithParams(query: string, params:any):Promise<any> {
+    try {
+      const executeQueryResponse = await this.executeQuery(query,params);
+      const data = executeQueryResponse ? this.extractData(executeQueryResponse) : [];
+      console.warn(data, 'insideparams')
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 
   extractData(res: any) {
     let list = [];
@@ -262,6 +273,7 @@ export class OfflineDataService {
     for (let i = 0; i < res.rows.length; i++) {
       list.push(res.rows.item(i));
     }
+    console.warn(list);
     return list;
   }
 
@@ -304,6 +316,9 @@ export class OfflineDataService {
     let formatted = rows.map((row: any) => Object.assign({}, ...keys.map((key: any, idx: any) => ({ [key]: row[idx] }))));
     return formatted;
   }
+
+
+  
 
 
 

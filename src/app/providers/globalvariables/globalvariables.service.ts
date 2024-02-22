@@ -49,4 +49,14 @@ export class GlobalvariablesService {
   getOrganisationname() {
     return this.Organisationname || localStorage.getItem("Organisationname");
   }
+
+  setUsername(value:any) {
+    localStorage.setItem("username", value);
+  }
+
+  getUsername() {
+    return  localStorage.getItem("username") || '';
+  }
+
+
 }

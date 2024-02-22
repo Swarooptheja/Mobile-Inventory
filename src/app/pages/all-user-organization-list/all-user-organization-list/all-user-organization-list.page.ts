@@ -45,7 +45,7 @@ export class AllUserOrganizationListPage implements OnInit {
 
   }
 
-  clearSerchItem () {
+  clearSearchItem () {
     this.searchText = ''
   };
 
