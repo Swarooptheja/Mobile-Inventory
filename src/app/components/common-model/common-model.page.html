@@ -1,5 +1,5 @@
 <ion-header class="hearder-top">
-  <app-header [heading]="type === 'subInventory' ? 'SubInvtories' : 'Locators'">
+  <app-header *ngIf="type" [heading]="type" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()">
 
   </app-header>
 
@@ -8,17 +8,22 @@
 
 
 <ion-content [fullscreen]="true">
-  <ion-list *ngFor="let item of data | filter :searchText" (click)="selectSubInv(item)"  lines="full">
-    <ion-item style="display: flex; gap: 40px;">
-      <ion-col *ngIf="type === 'subInventory'" >
-        <strong>{{item.SubInventoryCode}}</strong>
-        <p>
-            {{item.SubInventoryDesc}}
-        </p>
-      </ion-col>
-      <ion-col *ngIf="type === 'locators'" >
-        <strong>{{item.Locator}}</strong>
-      </ion-col>
-    </ion-item>
+  <ion-list *ngIf="data">
+    <ion-list *ngFor="let item of data | filter :searchText" (click)="selectSubInv(item)"  lines="full">
+      <ion-item style="display: flex; gap: 40px;">
+        <ion-col *ngIf="type === 'subInventory'" >
+          <strong>{{item.SubInventoryCode}}</strong>
+          <p>
+              {{item.SubInventoryDesc}}
+          </p>
+        </ion-col>
+        <ion-col *ngIf="type === 'locators'" >
+          <strong>{{item.Locator}}</strong>
+        </ion-col>
+        <ion-col *ngIf="type === 'lot'" >
+          <strong>{{item.ChildLot}}</strong>
+        </ion-col>
+      </ion-item>
+    </ion-list>
   </ion-list>
 </ion-content>

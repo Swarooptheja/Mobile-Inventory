@@ -74,7 +74,7 @@ export const Appsettings = {
         return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getOnhnadTableType`;
     },
     get getLotsTableType() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getLotsTableType` },
-    get serialTableTypeUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getSerialTableType`},
+    get getserialTableTypeUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_22A}getSerialTableType`},
     get getLocatorsUrl() { return `${fetchUrl.getUrl}${AppConfig.API_EBS_20D}getLocators` },
 
 
@@ -319,7 +319,25 @@ export const ERROR_MESSAGE = {
     PLEASE_SELECT_ORGANIZATION: 'Please select organization',
     LESS_QUANTITY: 'Please provide a quantity it should be less than Qty remaining',
     INVALID_SCAN: 'Invalid Scan',
-    PLEASE_SELECT_SUBINV:'Please select subinventory'
+    PLEASE_SELECT_SUBINV:'Please select subinventory',
+    PLEASE_SELECT_QTY: 'Please select quantity',
+    NOT_AVAILABLE_SERIALS: 'Not available serials for this Item Number',
+    NOT_AVAILABLE_LOT: 'Not available lots for this Item Number',
+    PLEASE_SELECT_VALID_SERIALS: 'Please select valid serials',
+    PLEASE_SELECT_VALID_LOT: 'Please select valid lot',
+    TOTAL_SERIALS_SHOULD_BE:'Total serials should be equal to quantity',
+    SELECTED_QTY_SHOULD_BE:'Entered quantity should not be more than quantity',
+    PLEASE_SELECT_LOT_AND_ENTER_QTY: 'Please enter quantity and select lot number',
+    PLEASE_ENTER_VALID_SUB_INV: 'Please enter valid subInventory',
+    NOT_AVAILABLE_SUB_INV: 'Not available subInventories for this item Number',
+    NOT_VALID_SUB_INV: 'Not valid SubInventory',
+    NOT_AVAILABLE_LOCATORS: 'Not Availale locators for this subInventory',
+    NOT_VALID_LOCATOR: 'Not valid Locator',
+    PLEASE_SELECT_LOCATOR: 'Please select locator',
+    PLEASE_SELECT_SERIALS: 'Please select serials',
+    PLEASE_SELECT_LOTS: 'Please select lot'
+
+
 };
 
 export const MESSAGE = {
@@ -351,11 +369,14 @@ export const TABLE_NAME = {
     GL_PERIODS: 'GL_PERIODS',
     INVENTORY_PERIODS: 'INVENTORY_PERIODS',
     PURCHASING_PERIODS: 'PURCHASING_PERIODS',
-    GOODS_RECEIPT_DOCS_RECEIVING: 'GOODS_RECEIPT_DOCS_RECEIVING'
+    GOODS_RECEIPT_DOCS_RECEIVING: 'GOODS_RECEIPT_DOCS_RECEIVING',
+    SERIALS: 'SERIALS',
+    LOT: 'LOT',
+    TRANSCTION_TABLE_RECEIPT: 'TRANSCTION_TABLE_RECEIPT'
 };
 
 export const RESPONSIBILITIES = {
-    INVENTORY_ORG: 'INVENTORY_ORG',
+  INVENTORY_ORG: 'INVENTORY_ORG',
   ITEM: "ITEM",
   ACCOUNT: "ACCOUNT",
   SUB_INV: "SUB_INV",
@@ -375,7 +396,9 @@ export const RESPONSIBILITIES = {
   GL_PERIODS: 'GL_PERIODS',
   INVENTORY_PERIODS: 'INVENTORY_PERIODS',
   PURCHASING_PERIODS: 'PURCHASING_PERIODS',
-  GOODS_RECEIPT_DOCS_RECEIVING: 'GOODS_RECEIPT_DOCS_RECEIVING'
+  GOODS_RECEIPT_DOCS_RECEIVING: 'GOODS_RECEIPT_DOCS_RECEIVING',
+  SERIALS: 'SERIALS',
+  LOT: 'LOT'
 
 
 };
@@ -407,7 +430,9 @@ export const API_CALLS_MESSAGES = {
     gl_periods: 'gl periods',
     inventory_periods: 'inventory periods',
     purchasing_periods: 'purchasing periods',
-    goods_receipt_docs_receiving: 'goods receipt docsreceiving'
+    goods_receipt_docs_receiving: 'goods receipt docsreceiving',
+    serials:'serials',
+    lot: 'lot'
 };
 
 export const ROUTE_PATHS={
@@ -449,6 +474,12 @@ export const QUERIES = {
     },
     LOCATOR: {
         GET:`SELECT * FROM ${TABLE_NAME.LOCATORS} WHERE SubInventoryCode = ?`
+    },
+    SERIALS: {
+        GET:`SELECT * FROM ${TABLE_NAME.SERIALS} WHERE ItemNumber = ?`
+    },
+    LOT: {
+        GET:`SELECT * FROM ${TABLE_NAME.LOT} WHERE ItemNumber = ?`
     }
 
 };
@@ -458,4 +489,9 @@ export enum LOCATOR_TYPE_CODE {
     PREDEFINED_LOCATOR = 2,
     DYNAMIC_ENTRY_LOCATOR = 3
   }
+
+export enum POST_TRANSACTION_DESTINATIONS {
+    RECEIVING = 'Receiving',
+    INVENTORY = 'Inventory'
+}
 

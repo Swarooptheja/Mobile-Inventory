@@ -83,6 +83,20 @@ export class LoginPage implements OnInit {
           let orgId = loginResult.filter((response:any)=>{
             return response.DEFAULT_ORG_ID !=="";
           })
+          const userId = loginResult.filter((response:any)=>{
+            return response.USER_ID !=='';
+          })
+          const personId = loginResult.filter((response:any)=>{
+            return response.PERSON_ID !=='';
+          });
+
+          if(userId && userId.length > 0) {
+            this.globalvar.setUserId(userId[0].USER_ID)
+          }
+          if(personId && personId.length > 0 ) {
+            this.globalvar.setPersonId(personId[0].PERSON_ID);
+          }
+          
           if(orgId && orgId.length > 0){
             this.globalvar.setOrgId(orgId[0].DEFAULT_ORG_ID)
           } else{

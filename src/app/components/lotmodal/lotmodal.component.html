@@ -1,0 +1,66 @@
+<ion-header class="hearder-top">
+  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()">
+
+  </app-header>
+
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <strong>#PO Number: {{this.data.PoNumber}}</strong>
+    </ion-item>
+    <ion-item>
+      <p>#Qty: {{this.data.QTY}} {{this.data.ItemUom}}</p>
+    </ion-item>
+    <ion-item>
+      <P>#Desc: {{this.data.ItemDesc}}</P>
+    </ion-item>
+  </ion-list>
+
+    <ion-list *ngFor="let lot of lotData let i = index">
+      <ion-item>
+        <ion-row class="qtyreceiving">
+          <ion-col col-5>
+            Qty Receiving :
+          </ion-col>
+          <ion-col col-4 ion-item>
+            <ion-input label-placement="floating" fill="outline" class="quantity-detail" type="number" placeholder="QTY" [(ngModel)]=" lot.inputQuantity"
+              (ionChange)="goToKeypad($event, i)"></ion-input>
+          </ion-col>
+          <ion-col col-3>
+            <strong>{{lot.ItemUom}}</strong>
+          </ion-col>
+        </ion-row> 
+      </ion-item>
+      <ion-item class="border-bottom-grey">
+        <ion-row>
+          <ion-col>
+            <ion-row class="row-alignment">
+              <ion-col col-4 class="text-overflow  ">
+                Lot:
+              </ion-col>
+              <ion-col col-4 ion-item>
+                <ion-input class="min-serial-input input-box" type="text" [placeholder]="'Select Lot'"
+                [(ngModel)]="lot.ChildLot" (ionChange)="onChangeSelectLot($event, i)"></ion-input>
+              </ion-col>
+              <ion-col col-4 (click)="lotModal(i)">
+                <ion-icon name="chevron-forward-outline" size="large"></ion-icon>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+      
+    </ion-list>
+
+  <ion-button [disabled]="isValidAddItem()" (click)="addLot()" class="add-item" >
+    Add Lot
+  </ion-button>
+</ion-content>
+
+<div text-center>
+  <ion-button class="po-item-btn" (click)="confirmLots()" [disabled]="confirmButtonValidation()" >
+    Confirm
+  </ion-button>
+</div>

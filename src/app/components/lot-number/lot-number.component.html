@@ -1,0 +1,24 @@
+
+<ion-list>
+  <ion-item class="border-bottom-grey">
+    <ion-col>
+      <ion-row class="row-alignment">
+        <ion-col col-4 class="text-overflow  ">
+          Lot:
+        </ion-col>
+        <ion-col col-4 ion-item *ngIf="!selectedLots">
+          <ion-input class="min-serial-input input-box" type="text" [placeholder]="'Select Lot'"
+           ></ion-input>
+        </ion-col>
+        <ion-col *ngIf="selectedLots">
+          <ion-item>
+            {{selectedLots.length}} selected
+          </ion-item>
+        </ion-col>
+        <ion-col col-4 (click)="LotModal()">
+          <ion-icon name="chevron-forward-outline" size="large"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-col>
+  </ion-item>
+</ion-list>

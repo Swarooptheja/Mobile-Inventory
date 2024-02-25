@@ -1,0 +1,36 @@
+ion-header {
+    background-color: #08668d;
+  }
+
+  .row-alignment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.po-item-btn {
+  // background-color: #08668d;
+  width: 90%;
+  margin: auto;
+  color: white;
+  padding: 15px;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  margin-left: 1rem;
+};
+
+.add-item {
+  width: 40%;
+  // background-color: #08668d;
+  margin-left: 8rem;
+  margin-top: 2rem;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.qtyreceiving {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+}

@@ -6,6 +6,7 @@ import { catchError, map, firstValueFrom } from 'rxjs';
 import { GlobalvariablesService } from '../globalvariables/globalvariables.service';
 import { Storage } from '@ionic/storage-angular'
 import { formatDate } from '@angular/common';
+import { GOODS_RECEIPT_QUERIES } from 'src/app/constants/queries';
 
 interface ColumnObject {
   name: string;
@@ -88,6 +89,21 @@ export class OfflineDataService {
       console.log(formatDate(new Date, 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
       constructUrl = `${url}/${invOrgId}/''/'Y'`
      }
+     else if (responsibilities === RESPONSIBILITIES.SERIALS) {
+      if(isDeltaSync) {
+        const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME)
+        constructUrl = `${url}/${invOrgId}/${lastSyncTime}/""/""`
+      }
+      constructUrl = `${url}/${invOrgId}/""/""/""`
+     }
+     else if (responsibilities === RESPONSIBILITIES.LOT) {
+      if(isDeltaSync) {
+        const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME)
+        constructUrl = `${url}/${invOrgId}/${lastSyncTime}`
+      }
+      constructUrl = `${url}/${invOrgId}/""`
+     }
+
 
 
       if (typeOfApi === TYPE_OF_APIS.REGULAR) {
@@ -117,14 +133,30 @@ export class OfflineDataService {
           return convertcsvToJson;
         }
       } else {
-        const metadataResp = await firstValueFrom(this.getMetadataResponseFromMasterAPI(url));
-        const createTableQuery = this.creatingTable(TableName, metadataResp);
-        await this.database.executeSql(createTableQuery, []);
-        console.log(`${TableName} table is created Successfully`);
-        const response: any = await firstValueFrom(this.getReponseFromAPI(constructUrl));
-        if (response) {
-          await this.insertDataIntoTable(response[fieldName], TableName);
-          return response;
+        if(fieldName){
+          const metadataResp = await firstValueFrom(this.getMetadataResponseFromMasterAPI(url));
+          const createTableQuery = this.creatingTable(TableName, metadataResp);
+          await this.database.executeSql(createTableQuery, []);
+          console.log(`${TableName} table is created Successfully`);
+          const response: any = await firstValueFrom(this.getReponseFromAPI(constructUrl));
+          // For creating a table for Transactions
+          await this.database.executeSql(GOODS_RECEIPT_QUERIES.RECEIPT.CREATE_TRANSACTIONS_TABLE, []);
+          console.log('Transaction Table is created')
+          if (response) {
+            await this.insertDataIntoTable(response[fieldName], TableName);
+            return response;
+          }
+
+        } else {
+             const tableTypeResp = await firstValueFrom(this.getResponseFromTableTypeApi(constructUrl));
+             const metadataResp = this.convertToMetadata(tableTypeResp);
+             const createTableQuery = this.creatingTable(TableName, metadataResp);
+             await this.database.executeSql(createTableQuery, []);
+             if (tableTypeResp) {
+              const convertcsvToJson = this.csvToJson(tableTypeResp);
+              await this.insertDataIntoTable(convertcsvToJson, TableName);
+              return convertcsvToJson;
+            }
         }
       }
       
@@ -194,6 +226,9 @@ export class OfflineDataService {
           }
           if(typeof element === 'object') {
             return "''"
+          }
+          if(typeof element === 'number') {
+            return element;
           }
           return element.replace(/'/g, "");
         }).join(',');

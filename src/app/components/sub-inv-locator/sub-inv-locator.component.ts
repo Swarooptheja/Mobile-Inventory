@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { SubInvLocatorService } from './sub-inv-locator.service';
 import { ERROR_MESSAGE, LOCATOR_TYPE_CODE, TABLE_NAME } from 'src/app/constants/pages/App-settings';
-import {ModalController} from '@ionic/angular'
+import { ModalController } from '@ionic/angular'
 import { CommonModelPage } from '../common-model/common-model.page';
 import { Subject } from 'rxjs';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
@@ -11,13 +11,10 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
   templateUrl: './sub-inv-locator.component.html',
   styleUrls: ['./sub-inv-locator.component.scss'],
 })
-export class SubInvLocatorComponent  implements OnInit {
-  @Input() poItem:any
-  // @Input() subInventory:any
-  // @Input() locator:any;
-  // @Input() isSubinvLocEnable:boolean = false;
-  isLocatorRestricted:boolean = false;
-  isSubInventoryRestricted:boolean = false;
+export class SubInvLocatorComponent implements OnInit {
+  @Input() poItem: any
+  isLocatorRestricted: boolean = false;
+  isSubInventoryRestricted: boolean = false;
   itemNumber: string = '';
   @Output() onSelectSubInventory = new EventEmitter();
   @Output() onSelectLocator = new EventEmitter();
@@ -25,31 +22,78 @@ export class SubInvLocatorComponent  implements OnInit {
   handleScanner$ = this.handleScanner.asObservable();
   defaultSubInv: any;
   defaultLocators: any;
-  processValueFor:string = 'SubInventory';
-  subInventories:any;
+  subInventories: any;
   subInventory: any;
-  subInventoryCode:any;
-  locator: string ='';
+  subInventoryCode: any;
+  locator: string = '';
   locatorRespose: any;
 
   constructor(
     private subInvLocatorService: SubInvLocatorService,
     private modalController: ModalController,
-    private uiProvider:UiProviderService
-  ) { 
+    private uiProvider: UiProviderService
+  ) {
   }
-  
+
   ngOnInit() {
     console.log({
       poIem: this.poItem,
     }, 'poItem');
-    this.isSubInventoryRestricted = this.poItem && this.poItem.IsSubinventoryRestricted && this.poItem.IsSubinventoryRestricted.toLowerCase() === 'false' ? false: true;
-      this.poItem && this.poItem.IsLocatorRestricted && this.poItem.IsLocatorRestricted.toLowerCase() === 'false' ? false : true;
+    this.isSubInventoryRestricted = this.poItem && this.poItem.IsSubinventoryRestricted && this.poItem.IsSubinventoryRestricted.toLowerCase() === 'false' ? false : true;
+    this.poItem && this.poItem.IsLocatorRestricted && this.poItem.IsLocatorRestricted.toLowerCase() === 'false' ? false : true;
     this.itemNumber = this.poItem ? this.poItem.ItemNumber : '';
     this.loadSubInvFromLocalDB();
     this.subInventoryCode = this.poItem.DefaultSubInventoryCode;
-    if(this.subInventoryCode) {
+    if (this.subInventoryCode) {
       this.loadLocatorFromLocalDB();
+    }
+  }
+
+  onChangeSubInventory(event: any) {
+    try {
+      const value = event.target.value;
+      if (!this.subInventories.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_SUB_INV);
+        this.subInventoryCode = '';
+        return;
+      };
+      const validSubInv = this.subInventories.find((subInv: any) => subInv.SubInventoryCode === value);
+      if (!validSubInv) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_VALID_SUB_INV);
+        this.subInventoryCode = '';
+        return;
+      }
+      this.emitSubInventory(validSubInv.subInventoryCode);
+
+    } catch (error) {
+      console.error(error);
+
+    }
+
+  };
+
+  onChangeLocator (event: any) {
+    try {
+      const value = event.target.value;
+      if (!this.subInventoryCode) {
+        this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_SUBINV);
+        this.locator = ''
+        return;
+      }
+      if(!this.locatorRespose.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_LOCATORS);
+        this.locator = '';
+        return
+      };
+      const validLocator = this.locatorRespose.find((locator:any) => locator.Locator === value);
+      if(!validLocator) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_VALID_LOCATOR);
+        this.locator = '';
+        return
+      }
+      this.emitLocator(validLocator.Locator)
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -57,14 +101,11 @@ export class SubInvLocatorComponent  implements OnInit {
     let subInvParams: any = {
       type: 'subInventory',
       data: this.subInventories,
-      
+
     };
-    // if (this.defaultSubInv) {
-    //   subInvParams.defaultSubInv = this.defaultSubInv;
-    // };
     const subInvModel = await this.modalController.create({
-      component:CommonModelPage,
-      componentProps:subInvParams
+      component: CommonModelPage,
+      componentProps: subInvParams
     });
     subInvModel.present();
     const { data, role } = await subInvModel.onWillDismiss();
@@ -72,13 +113,14 @@ export class SubInvLocatorComponent  implements OnInit {
     if (role === 'subInventory') {
       this.subInventory = data;
       this.subInventoryCode = data.SubInventoryCode
-      // this.locator = data.LocatorTypeCode
+
+      this.emitSubInventory(this.subInventoryCode);
 
     }
     this.loadLocatorFromLocalDB();
   };
 
-  async loadSubInvFromLocalDB () {
+  async loadSubInvFromLocalDB() {
     try {
       const subInvResp = await this.subInvLocatorService.getSubInvenoryList(TABLE_NAME.SUBINVENTORY);
       this.subInventories = subInvResp;
@@ -87,40 +129,52 @@ export class SubInvLocatorComponent  implements OnInit {
     }
   }
 
-  async loadLocatorFromLocalDB () {
+  async loadLocatorFromLocalDB() {
     try {
       const locatorResp = await this.subInvLocatorService.getLocatorList(this.subInventoryCode);
-      if(locatorResp.length ===1) {
+      if (locatorResp.length === 1) {
         this.locator = locatorResp[0].Locator
       }
       this.locatorRespose = locatorResp;
-      console.log(locatorResp,'theja');
     } catch (error) {
       console.log(error)
     }
   }
 
   async locatorModal() {
-    if(!this.subInventoryCode) {
+    if (!this.subInventoryCode) {
       this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_SUBINV);
       return;
     }
     let locatorParams: any = {
       type: 'locators',
       data: this.locatorRespose,
-      
+
     };
     const locatorModel = await this.modalController.create({
-      component:CommonModelPage,
-      componentProps:locatorParams
+      component: CommonModelPage,
+      componentProps: locatorParams
     });
     locatorModel.present();
     const { data, role } = await locatorModel.onWillDismiss();
 
     if (role === 'locators') {
       this.locator = data.Locator
-
+      this.emitLocator(this.locator)
     }
   };
 
+  emitSubInventory(subInventory: any) {
+    this.onSelectSubInventory.emit({
+      ...this.poItem,
+      subInventory
+    })
+  };
+
+  emitLocator(locator: any) {
+    this.onSelectLocator.emit({
+      ...this.poItem,
+      locator
+    })
+  }
 }

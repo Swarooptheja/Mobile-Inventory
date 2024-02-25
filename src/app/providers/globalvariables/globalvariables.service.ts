@@ -58,5 +58,20 @@ export class GlobalvariablesService {
     return  localStorage.getItem("username") || '';
   }
 
+  setUserId(value: any) {
+    localStorage.setItem("userId", value);
+  }
+  getUserId() {
+    return localStorage.getItem("userId");
+  }
+
+  setPersonId(value: any) {
+    localStorage.setItem("personId", value);
+  }
+
+  getPersonId() {
+    return localStorage.getItem("personId")
+  }
+
 
 }

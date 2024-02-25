@@ -34,7 +34,7 @@
               </ion-col>
               <ion-col col-4 ion-item>
                 <ion-input class="quantity-detail" type="tel" placeholder="QTY" [(ngModel)]="purchaseOrderItem.QTY"
-                  (ionChange)="goToKeypad($event)"></ion-input>
+                  (ionChange)="goToKeypad($event, i)"></ion-input>
               </ion-col>
               <ion-col col-3>
                 <strong>{{purchaseOrderItem.ItemUom}}</strong>
@@ -48,25 +48,30 @@
               </ion-col>
               <ion-col col-4 ion-item>
                 <ion-input class="quantity-detail" type="tel" placeholder="QTY" [(ngModel)]="purchaseOrderItem.QTY"
-                  (ionChange)="goToKeypad($event)"></ion-input>
+                  (ionChange)="goToKeypad($event, i)"></ion-input>
               </ion-col>
               <ion-col col-3>
                 <strong>{{purchaseOrderItem.ItemUom}}</strong>
               </ion-col>
             </ion-row>     
             <ion-row>
-              <app-sub-inv-locator *ngIf="purchaseOrderItem && purchaseOrderItem.ItemNumber && i == index" [poItem]="purchaseOrderItem">
+              <app-sub-inv-locator *ngIf="isSubInvLocValid(purchaseOrderItem)" [poItem]="purchaseOrderItem" (onSelectLocator)="onSelectLocator($event)" (onSelectSubInventory)="onSelectSubInventory($event)">
               </app-sub-inv-locator>
+            </ion-row>
+              <app-serial-number *ngIf="isSubInvLocValid(purchaseOrderItem) && isSerialControlled(purchaseOrderItem)"  [poItem]="purchaseOrderItem" (onSelectSerials)="onSelectSerials($event)" >
+              </app-serial-number>
+            <ion-row>
+              <app-lot-number *ngIf="isSubInvLocValid(purchaseOrderItem) && isLotControlled(purchaseOrderItem)" [poItem]="purchaseOrderItem" (onSelectLots)="onSelectLots($event)" >
+              </app-lot-number>
             </ion-row>
           </div>
 
         </div>
         <div class="separator"></div>
       </ion-col>
+      <ion-col color="#08668d">
+        <ion-button class="save-button" (click)="performPostTransaction(purchaseOrderItem, i)">Done</ion-button>
+      </ion-col>
     </swiper-slide>
   </swiper-container>
-  <ion-col color="#08668d">
-
-    <ion-button class="save-button">SAVE+NEXT</ion-button>
-  </ion-col>
 </ion-content>

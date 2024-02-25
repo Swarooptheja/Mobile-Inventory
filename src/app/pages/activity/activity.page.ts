@@ -46,7 +46,7 @@ export class ActivityPage implements OnInit {
         this.loadingCard = await this.presentLoadingCard(apimessage);
         await this.updateLoadingCard(this.loadingCard, 'loading', `${apimessage} fetching`);
         const response = await presentApi;
-        if (!response) {
+        if (!response && !(apimessage === API_CALLS_MESSAGES.lot || apimessage === API_CALLS_MESSAGES.serials)) {
           throw new Error('API call failed')
         }
         await this.updateLoadingCard(this.loadingCard, 'checkmark-circle', `${apimessage} fetched & Saved`);

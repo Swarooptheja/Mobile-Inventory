@@ -10,7 +10,7 @@ import { ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 export class CommonModelPage implements OnInit {
 
   // heading:string = 'SubInventories';
-  // isBack:boolean = true;
+  isBack:boolean = true;
   subInventories: any;
   searchText:any;
   subInventoryCode: any;
@@ -44,5 +44,9 @@ export class CommonModelPage implements OnInit {
     this.selectedItem = item;
     return this.modalController.dismiss(this.selectedItem, this.type)
   };
+
+  goBackToPreviousPage () {
+    this.modalController.dismiss()
+  }
 
 }
