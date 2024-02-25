@@ -10,11 +10,11 @@ import { OfflineDataService } from 'src/app/providers/offline/offline-data.servi
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
-  heading:string = 'Dashboard';
+  heading: string = 'Dashboard';
   isHome: boolean = false;
   isMenu: boolean = true;
   userDetails: any;
-  goodsReceiptResp:boolean = true;
+  goodsReceiptResp: boolean = true;
   goodReceipt = {
     openCount: 0,
     completedCount: 0,
@@ -25,29 +25,29 @@ export class DashboardPage implements OnInit {
     private navCtrl: NavController,
     private offlineDataService: OfflineDataService
   ) {
-    
-   }
+
+  }
 
   ngOnInit() {
-    
+
   }
   ionViewWillEnter() {
-    this.storage.get('userDetails').then((userDetails)=>{
+    this.storage.get('userDetails').then((userDetails) => {
       this.userDetails = userDetails;
     })
     this.loadGoodReceiptCount();
   }
 
-  async loadGoodReceiptCount () {
+  async loadGoodReceiptCount() {
     const allGoodsReceiptData = await this.offlineDataService.executeQueryWithoutParams(QUERIES.GOODS_RECEIPT.GET_PURCHASE_ORDERS_LIST);
     this.goodReceipt.openCount = allGoodsReceiptData.length;
   }
 
   goToGoodsReceipt() {
-    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE)
+    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
   }
-  goToTransactionBatch () {
-
+  goToTransactionHistoryPage() {
+    this.navCtrl.navigateForward(ROUTE_PATHS.TRANSACTION_HISTORY);
   }
 
 }

@@ -345,7 +345,9 @@ export const MESSAGE = {
     LOGIN_SUCCESS: 'Login Success',
     DATA_LOADING: 'Please wait data is loading ...',
     LOGOUT: 'Are you sure want to logout ?',
-    ORGANIZATIONS_PAGE: 'Are you sure want to change Inventory OrgId'
+    ORGANIZATIONS_PAGE: 'Are you sure want to change Inventory OrgId',
+    TRANSACTION_SUCCESS: 'Transaction Successful',
+    TRANSACTION_FAILED: 'Transaction failed'
 };
 
 export const TABLE_NAME = {
@@ -443,7 +445,8 @@ export const ROUTE_PATHS={
     DASH_BOARD: 'dashboard',
     GOODS_RECEIPT_ITEMS_PAGE:'goods-receipt-items',
     GOODS_RECEIPT_ITEM_DETAILS_PAGE:'goods-receipt-item-details',
-    COMMON_MODEL: 'common-model'
+    COMMON_MODEL: 'common-model',
+    TRANSACTION_HISTORY: 'transaction-history'
 };
 
 export const CONSTANTS = {

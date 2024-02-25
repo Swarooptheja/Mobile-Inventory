@@ -48,6 +48,10 @@ const routes: Routes = [
     path: 'common-model',
     loadChildren: () => import('./components/common-model/common-model.module').then( m => m.CommonModelPageModule)
   },
+  {
+    path: 'transaction-history',
+    loadChildren: () => import('./pages/transaction-history/transaction-history.module').then( m => m.TransactionHistoryPageModule)
+  },
 ];
 
 @NgModule({

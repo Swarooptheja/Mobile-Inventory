@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { ERROR_MESSAGE, POST_TRANSACTION_DESTINATIONS, ROUTE_PATHS, TABLE_NAME } from 'src/app/constants/pages/App-settings';
+import { ERROR_MESSAGE, MESSAGE, POST_TRANSACTION_DESTINATIONS, ROUTE_PATHS, TABLE_NAME } from 'src/app/constants/pages/App-settings';
 import { ActivatedRoute } from '@angular/router';
 import { IonicSlides } from '@ionic/angular';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
@@ -150,9 +150,18 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
             transaction.status = response['Response'][0].RecordStatus;
             transaction.receiptInfo = response['Response'][0].ReceiptNumber;
             transaction.error = response['Response'][0].Message
+          };
+          // Insert Transaction Data into table        
+        this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
+
+        if(response && response ['Response']) {
+          if(response['Response'][0].RecordStatus === 'S') {
+            this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+            return;
           }
-        
-        this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT)
+          this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
+          return;
+        }
         return;
       };
 
