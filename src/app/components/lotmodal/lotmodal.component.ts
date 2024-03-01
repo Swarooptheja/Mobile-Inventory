@@ -7,15 +7,6 @@ import { ERROR_MESSAGE } from 'src/app/constants/pages/App-settings';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 
-// interface LotData<T> {
-//   [key: string]: T
-// }
-
-// interface localLotData extends LotData<any> {
-//   scanLot?: string;
-//   quantity?: number;
-// }
-
 @Component({
   selector: 'app-lotmodal',
   templateUrl: './lotmodal.component.html',
@@ -107,8 +98,9 @@ export class LotmodalComponent implements OnInit {
   };
 
   confirmButtonValidation() {
+    const validChildLot = this.lotData.filter((item: any)=>item.ChildLot);
     const totalQuantity = this.lotData.reduce((acc: number, lot: any) => acc + lot.quantity, 0);
-    return totalQuantity !== Number(this.data.QTY)
+    return (totalQuantity !== Number(this.data.QTY) || validChildLot.length !==this.lotData.length )
   }
 
   goToKeypad(event: any, index: number) {

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController, LoadingController, IonContent } from '@ionic/angular';
-import { API_CALLS_MESSAGES } from 'src/app/constants/pages/App-settings';
+import { API_CALLS_MESSAGES, CONFIRM_MESSAGES, MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { MasterApiDataService } from 'src/app/providers/All-apis/master-api-data.service';
 import { SyncDataService } from 'src/app/providers/All-apis/sync-data.service';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
@@ -15,15 +15,14 @@ export class ActivityPage implements OnInit {
   isDeltaSync: boolean = true;
   resultArray: any[] = [];
   loadingCard: any;
-  isBack: boolean = true;
+  isBack: boolean = false;
+  isLogOut: boolean = true
   displaySyncAgain: boolean = false
   @ViewChild('ionContent', { static: false })
   ionContent!: IonContent;
   constructor(
     private navCtrl: NavController,
     private syncDataService: SyncDataService,
-    private masterDataService: MasterApiDataService,
-    private loadingController: LoadingController,
     private uiProvider: UiProviderService
   ) {
 
@@ -33,13 +32,12 @@ export class ActivityPage implements OnInit {
   }
   ngOnInit() {
   }
-  goBackToPreviousPage() {
-    this.navCtrl.navigateBack('all-user-organization-list')
+  logOut() {
+    this.uiProvider.showConfirmation(ROUTE_PATHS.LOGIN,MESSAGE.LOGOUT, '', CONFIRM_MESSAGES.LOG_OUT);
   };
 
   async getSyncAllAPIs() {
     const promiseArray = await this.syncDataService.getSync(false);
-    console.log("promiseArray", promiseArray);
     let navigate = true;
     for (const { presentApi, apimessage } of promiseArray) {
       try {

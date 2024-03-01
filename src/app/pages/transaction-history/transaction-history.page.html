@@ -1,11 +1,27 @@
 <ion-header>
-  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()"></app-header>
+  <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()" [isSync]="isSync" (onRefresh)="syncData()" ></app-header>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">transaction-history</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="onPullRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-toolbar>
+    <ion-card *ngFor="let item of transactionData">
+      <ion-card-header>
+        <ion-card-title>
+          PO # {{item.PoNumber}}
+        </ion-card-title>
+        <ion-card-subtitle>Item No#{{item.ItemNumber}}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <span *ngIf="item.error">Error: {{ item.error }}</span><br/>
+        <div class="status_delete">
+          <span [style.color]="item.status === 'S'? 'green': 'red'" class= "status">Status: {{ item.status === 'local'? 'Pending': item.status === 'S'? 'Success': 'Error' }}</span>
+          <ion-icon name="trash-outline" slot="icon-only" size="large" *ngIf="item.status === 'E'" slot="end" (click)="deletetransaction(item.id)"></ion-icon>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ion-toolbar>
 </ion-content>

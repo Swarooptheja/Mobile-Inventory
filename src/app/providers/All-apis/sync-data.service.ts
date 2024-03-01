@@ -24,9 +24,8 @@ export class SyncDataService {
       ]
     }
     else {
-      promiseResult = [
-        ...this.transactionDataService.syncTransactionDataAPIs(isDeltaSync)
-      ]
+      promiseResult = this.transactionDataService.syncTransactionDataAPIs(isDeltaSync)
+      
     }
     return promiseResult;
   }

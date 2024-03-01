@@ -10,6 +10,7 @@ import { SerialNumberComponent } from '../../serial-number/serial-number.compone
 import { SerialmodalComponent } from '../../serialmodal/serialmodal.component';
 import { LotNumberComponent } from '../../lot-number/lot-number.component';
 import { LotmodalComponent } from '../../lotmodal/lotmodal.component';
+import { BarcodeScannerComponent } from '../../barcode-scanner/barcode-scanner.component';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { LotmodalComponent } from '../../lotmodal/lotmodal.component';
    SerialNumberComponent,
    SerialmodalComponent,
    LotNumberComponent,
-   LotmodalComponent
+   LotmodalComponent,
+   BarcodeScannerComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +36,8 @@ import { LotmodalComponent } from '../../lotmodal/lotmodal.component';
     SerialNumberComponent,
     SerialmodalComponent,
     LotNumberComponent,
-    LotmodalComponent
+    LotmodalComponent,
+    BarcodeScannerComponent
   ]
 })
 export class SharedModule { }

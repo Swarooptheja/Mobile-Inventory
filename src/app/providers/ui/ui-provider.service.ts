@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Toast } from '@capacitor/toast';
 import { LoadingController, ToastController, ModalController, AlertController, NavController } from '@ionic/angular';
-import { Appsettings, MESSAGE } from 'src/app/constants/pages/App-settings';
+import { Appsettings, MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
+import { OfflineDataService } from '../offline/offline-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ export class UiProviderService {
     private toastController: ToastController,
     private modelCtrl: ModalController,
     private alertCtrl: AlertController,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private OfflineDataService: OfflineDataService
   ) { }
 
   async showError(errorMessage: string) {
@@ -43,6 +45,10 @@ export class UiProviderService {
     await toast.present()
   }
 
+  async dismissSuccess () {
+     await this.toastController.dismiss()
+  }
+
   // Create Loader
 
   getCustomLoader(message: string) {
@@ -59,12 +65,8 @@ export class UiProviderService {
   };
 
   // Dismiss loader
-  dismissLoader(): void {
-    const dismiss = this.loadingCtrl.dismiss().then((response) => {
-      console.log('Loader closed!', response);
-    }).catch((err) => {
-      console.log('Error occured : ', err);
-    });
+  async dismissLoader() {
+    await this.loadingCtrl.dismiss()
   }
   async showAlert(message: any, position: 'top' | 'middle' | 'bottom') {
     const toast = await this.toastController.create({
@@ -84,10 +86,10 @@ export class UiProviderService {
     return loader;
   }
 
-  async showConfirmation(path:string, message:string, menu:any) {
+  async showConfirmation(path:string, message:string, menu:any, header: any) {
     const alert = await this.alertCtrl.create({
       message: message,
-      header: 'Log out',
+      header: header,
       buttons: [{
         text: 'Cancel',
         role: 'cancel',
@@ -98,15 +100,48 @@ export class UiProviderService {
       {
         text: 'OK',
         role: 'confirm',
-        handler: () => {
+        handler: async () => {
           console.log('Alert confirmed');
-          menu.close();
-          this.navCtrl.navigateRoot(path)
+          if(menu) {
+            menu.close();
+            if(ROUTE_PATHS.LOGIN === path) {
+              await this.OfflineDataService.deleteSqlLiteDB();
+            };
+            this.navCtrl.navigateRoot(path)
+          } else {
+            await this.OfflineDataService.deleteSqlLiteDB();
+            this.navCtrl.navigateRoot(path);
+          }
         },
       },
       ]
     });
     alert.present();
+  };
+
+  async showDeleteConfirm () {
+    const alert = await this.alertCtrl.create({
+      message: 'Are you sure want to delete',
+      header: 'TransactionHistory',
+      buttons:[{
+        text:'Cancel',
+        role: 'cancel',
+        handler: () => {
+          console.log('alert dismissed')
+        }
+      },
+      {
+        text: 'OK',
+        role: 'confirm',
+        handler: () => {
+          console.log('Alert confirmed');
+          
+        },
+      },
+    ]
+    });
+
+    return alert
   }
 
 }

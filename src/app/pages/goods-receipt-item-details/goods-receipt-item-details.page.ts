@@ -8,6 +8,7 @@ import { GoodsReceiptDataService } from '../goods-receipt-po-list/goods-receipt-
 import { NetworkproviderService } from 'src/app/providers/network/networkprovider.service';
 import { OfflineDataService } from 'src/app/providers/offline/offline-data.service';
 import { firstValueFrom } from 'rxjs';
+import { SyncDataService } from 'src/app/providers/All-apis/sync-data.service';
 
 @Component({
   selector: 'app-goods-receipt-item-details',
@@ -17,44 +18,45 @@ import { firstValueFrom } from 'rxjs';
 export class GoodsReceiptItemDetailsPage implements OnInit {
   heading: string = 'Item Details Page'
   isBack: boolean = true;
-  poSubItemDetails:any;
-  index:any;
-  receiptPurchaseOrderItems:any = [];
+  poSubItemDetails: any;
+  index: any;
+  receiptPurchaseOrderItems: any = [];
   itemNumber: any;
   destination: any;
   swiperModules = [IonicSlides];
-  locator:any;
+  locator: any;
   subInventory: any;
-  serials:any;
-  lots:any;
+  serials: any;
+  lots: any;
   @ViewChild('swiper') swiperRef: ElementRef | undefined;
-  isSubinvLocEnable:boolean = true;
+  isSubinvLocEnable: boolean = true;
   constructor(
     private navCtrl: NavController,
     private route: ActivatedRoute,
     private uiProvider: UiProviderService,
     private goodReceiptService: GoodsReceiptDataService,
     private networkService: NetworkproviderService,
-    private offlineDataService: OfflineDataService
+    private offlineDataService: OfflineDataService,
+    private syncDataService: SyncDataService
 
   ) {
-    this.route.queryParams.subscribe((params:any)=>{
-      this.poSubItemDetails = params.selectedPoLineItem;
-      this.index = params.selectedIndex,
-      // this.receiptPurchaseOrderItems = params.receiptPurchaseOrderItems,
-      this.getpurchaseOrderItem()
+    this.route.queryParams.subscribe((params: any) => {
+      this.poSubItemDetails = params?.selectedPoLineItem;
+      this.index = params?.selectedIndex,
+        // this.receiptPurchaseOrderItems = params.receiptPurchaseOrderItems,
+        this.getpurchaseOrderItem()
     })
   }
-  
-  getpurchaseOrderItem () {
+
+  getpurchaseOrderItem() {
     this.receiptPurchaseOrderItems.push(this.poSubItemDetails);
     this.itemNumber = this.poSubItemDetails.ItemNumber;
     this.destination = this.poSubItemDetails.DestinationType;
   }
-  
+
   ngOnInit() {
-    console.log(this.destination,'thejaswaroop')
-    console.log(this.receiptPurchaseOrderItems,'receiptpurchaseorderitem')
+    console.log(this.destination, 'thejaswaroop')
+    console.log(this.receiptPurchaseOrderItems, 'receiptpurchaseorderitem')
     console.log(this.poSubItemDetails, 'poSubItemDetails')
   }
 
@@ -63,76 +65,78 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
     this.navCtrl.back();
   }
 
-  onSlideChange () {
-    if(this.swiperRef?.nativeElement.swiper.activeIndex >= this.receiptPurchaseOrderItems.length) {
+  onSlideChange() {
+    if (this.swiperRef?.nativeElement.swiper.activeIndex >= this.receiptPurchaseOrderItems.length) {
       return;
     };
     this.index = this.swiperRef?.nativeElement.swiper.activeIndex;
-    console.log(this.index,"index")
+    console.log(this.index, "index")
     this.destination = this.receiptPurchaseOrderItems[this.index].DestinationType;
-    console.log(this.destination,'destination')
-		this.itemNumber = this.receiptPurchaseOrderItems[this.index].ItemNumber;
+    console.log(this.destination, 'destination')
+    this.itemNumber = this.receiptPurchaseOrderItems[this.index].ItemNumber;
   };
 
-  goToKeypad (event:any, index: number) {
-    if(event){
-			this.checkQuantityValidation(event?.detail?.value, index);
-		}
+  goToKeypad(event: any, index: number) {
+    if (event) {
+      this.checkQuantityValidation(event?.detail?.value, index);
+    }
   }
 
-   checkQuantityValidation(quantityReceived: string, index:number) {
-		const currentPurchaseOrderItem: any = this.receiptPurchaseOrderItems[index];
-		let quantityRemaining: number = Number(currentPurchaseOrderItem.QtyRemaining);
+  checkQuantityValidation(quantityReceived: string, index: number) {
+    const currentPurchaseOrderItem: any = this.receiptPurchaseOrderItems[index];
+    let quantityRemaining: number = Number(currentPurchaseOrderItem.QtyRemaining);
 
     if (quantityRemaining < Number(quantityReceived)) {
       this.receiptPurchaseOrderItems[index].QTY = ''
       this.uiProvider.showError(ERROR_MESSAGE.LESS_QUANTITY);
       return;
-    } 
-      this.receiptPurchaseOrderItems[index].QTY = quantityReceived;
-	}
+    }
+    this.receiptPurchaseOrderItems[index].QTY = quantityReceived;
+  }
 
-  onChange (event:any) {
+  onChange(event: any) {
     console.log(event, 'event')
   }
 
-  isSubInvLocValid (purchaseOrderItem:any):boolean {
+  isSubInvLocValid(purchaseOrderItem: any): boolean {
     return purchaseOrderItem && purchaseOrderItem.ItemNumber
   }
 
-  isSerialControlled(purchaseOrderItem:any):boolean {
-    return purchaseOrderItem.IsSerialControlled.toLowerCase() === 'true'? true : false
-  }
-  
-  isLotControlled (purchaseOrderItem: any):boolean {
-    return purchaseOrderItem.IsLotControlled.toLowerCase() === 'true'? true : false
+  isSerialControlled(purchaseOrderItem: any): boolean {
+    return purchaseOrderItem.IsSerialControlled.toLowerCase() === 'true' ? true : false
   }
 
-  onSelectLocator (event: any) {
+  isLotControlled(purchaseOrderItem: any): boolean {
+    return purchaseOrderItem.IsLotControlled.toLowerCase() === 'true' ? true : false
+  }
+
+  onSelectLocator(event: any) {
     this.locator = event.locator
     console.log(event, 'parantlocator')
   }
-  onSelectSubInventory (event: any) {
+  onSelectSubInventory(event: any) {
     this.subInventory = event.subInventory;
     console.log(event, 'parentsubinventory')
   }
 
-  onSelectSerials (event:any) {
+  onSelectSerials(event: any) {
     this.serials = event.selectedSerials
     console.log(event, 'parent serials')
   }
-  
-  onSelectLots (event:any) {
+
+  onSelectLots(event: any) {
     this.lots = event.selectedLots
     console.log(event, 'parentlots')
   }
 
-  async performPostTransaction (purchaseOrderItem:any, index:any) {
+  async performPostTransaction(purchaseOrderItem: any, index: any) {
     try {
-      if (!this.checkAllValidations (purchaseOrderItem)) {
+      if (!this.checkAllValidations(purchaseOrderItem)) {
         return;
-      }
-      
+      };
+
+      this.uiProvider.getCustomLoader(MESSAGE.PLEASE_WAIT);
+
       const currentPurchaseOrderItem = {
         ...purchaseOrderItem,
         selectedLot: this.lots,
@@ -140,66 +144,76 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
         selectedSubInventory: this.subInventory,
         selectedLocator: this.locator
       };
-      const payload = await this.goodReceiptService.goodsReceiptPayload(currentPurchaseOrderItem);
+      const payload = await this.goodReceiptService.goodsReceiptPayload([currentPurchaseOrderItem]);
 
       const transaction = this.goodReceiptService.saveTransactionHistory(currentPurchaseOrderItem);
+      purchaseOrderItem.QtyRemaining = parseInt(purchaseOrderItem.QTY, 10)
+        ? (purchaseOrderItem.QtyRemaining - parseInt(purchaseOrderItem.QTY, 10))
+        : purchaseOrderItem.QtyRemaining;
+      if (this.networkService.isOnline()) {
+        const response: any = await firstValueFrom(this.goodReceiptService.performPostOperation(payload));
 
-      if(this.networkService.isOnline()) {
-        const response: any  = await firstValueFrom(this.goodReceiptService.performPostOperation(payload));
-          if(response  && response['Response']) {
-            transaction.status = response['Response'][0].RecordStatus;
-            transaction.receiptInfo = response['Response'][0].ReceiptNumber;
-            transaction.error = response['Response'][0].Message
-          };
-          // Insert Transaction Data into table        
+        if (response && response['Response']) {
+          transaction.status = response['Response'][0].RecordStatus;
+          transaction.receiptInfo = response['Response'][0].ReceiptNumber;
+          transaction.error = response['Response'][0].Message
+        };
+        // Insert Transaction Data into table        
         this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
+        
+        this.uiProvider.dismissLoader();
+        if (response && response['Response']) {
+          if (response['Response'][0].RecordStatus === 'S') {
+            await this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+            const promiseArray = await this.syncDataService.getSync(true);
 
-        if(response && response ['Response']) {
-          if(response['Response'][0].RecordStatus === 'S') {
-            this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+            for (const { presenApi } of promiseArray) {
+              const response = await presenApi;
+              console.log(response, 'calling Delta Sync API')
+            };
+            this.uiProvider.dismissSuccess();
+            this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE)
             return;
           }
-          this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
+         await this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
+         await this.uiProvider.dismissSuccess();
+         this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
+
           return;
         }
         return;
       };
+      await this.uiProvider.dismissLoader();
+      this.uiProvider.showSuccess(MESSAGE.SAVED_GOODS_RECEIPT_DATA_LOCALLY);
+      await this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
+      await this.uiProvider.dismissSuccess();
+      this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
 
-      this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT)
-
-
-
-
-      
-      
     } catch (error) {
       console.log(error);
     }
 
-  
-    
-
   }
 
-  checkAllValidations(purchaseOrderItem:any):any {
-    if(!purchaseOrderItem.QTY) {
+  checkAllValidations(purchaseOrderItem: any): any {
+    if (!purchaseOrderItem.QTY) {
       this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_QTY);
       return false
     }
-    if(this.destination === POST_TRANSACTION_DESTINATIONS.INVENTORY) {
+    if (this.destination === POST_TRANSACTION_DESTINATIONS.INVENTORY) {
       if (!this.subInventory) {
         this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_SUBINV)
         return false;
       };
-      if(!this.locator) {
+      if (!this.locator) {
         this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_LOCATOR);
         return false;
       };
-      if(this.isSerialControlled(purchaseOrderItem) && !this.serials) {
+      if (this.isSerialControlled(purchaseOrderItem) && !this.serials) {
         this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_SERIALS);
         return false;
       };
-      if(this.isLotControlled(purchaseOrderItem) && !this.lots) {
+      if (this.isLotControlled(purchaseOrderItem) && !this.lots) {
         this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_LOTS);
         return false;
       }
@@ -208,8 +222,5 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
     }
     return true
   }
-    // Build payload here 
-
-
 
 }

@@ -4,6 +4,9 @@
 
 
 <ion-content [fullscreen]="true" >
+  <ion-refresher slot="fixed" (ionRefresh)="onPullRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <div class="sticky-content">
   <ion-card>
     <ion-card-content>
@@ -34,14 +37,16 @@
   <div class="separator"></div>
 </div>
   <div class="container">
-    <ion-item class="square-input">
-      <ion-input placeholder="Scan Item "></ion-input>
-    </ion-item>
-    <ion-icon class="searchitem" name="search-outline" size="medium" slot="end" (click)="toggleSearch()" ></ion-icon>
+    <!-- <ion-icon class="searchitem" name="search-outline" size="medium" slot="end" (click)="toggleSearch()" ></ion-icon> -->
   </div>
 <div class="remaining-content">
-  <div *ngIf="showSearchBar">
-<app-search-bar [searchText]="searchText" [placeHolder]="'Search Item'" (clearItems)="clearSearchItem()" (searchItems)="getsearchItems($event)"></app-search-bar>
+  <div>
+    <div class="barcode_searchbar">
+      <app-barcode-scanner (scanItem)="scanItemNumber($event)">
+
+      </app-barcode-scanner>
+      <app-search-bar [searchText]="searchText" [placeHolder]="'Search Item'" (clearItems)="clearSearchItem()" (searchItems)="getsearchItems($event)"></app-search-bar>
+    </div>
 
     <!-- <ion-searchbar *ngIf="showSearchBar" slot="end"  (ionClear)="clearSearch()" (ionInput)="onSearchPoNum()" [(ngModel)]="searchPoNum" placeholder="Item Search"></ion-searchbar> -->
   </div>

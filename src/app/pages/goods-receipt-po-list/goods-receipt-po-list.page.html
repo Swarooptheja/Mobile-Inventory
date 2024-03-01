@@ -1,11 +1,20 @@
 <ion-header>
   <app-header [heading]="heading" [isBack]="isBack" (onNavigateBack)="goBackToPreviousPage()"></app-header>
 </ion-header>
-<div>
-</div>
 <ion-content>
-  <app-search-bar [searchText]="searchText" [placeHolder]="'Search for PO'" (clearItems)="clearSearchItem()"
+  <ion-refresher slot="fixed" (ionRefresh)="onPullRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div class="container">
+    <!-- <ion-icon class="searchitem" name="search-outline" size="medium" slot="end" (click)="toggleSearch()" ></ion-icon> -->
+    
+  </div>
+  <div class="barcode_searchbar">
+      <app-barcode-scanner  (scanItem)="scanPONumber($event)">
+      </app-barcode-scanner>
+    <app-search-bar [searchText]="searchText" [placeHolder]="'Search for PO'" (clearItems)="clearSearchItem()"
     (searchItems)="getsearchItems($event)"></app-search-bar>
+  </div>
   <cdk-virtual-scroll-viewport itemSize="56">
     <ion-card *cdkVirtualFor="let receiptPurchaseOrderItem of goodsReceiptList | filter:searchText">
 

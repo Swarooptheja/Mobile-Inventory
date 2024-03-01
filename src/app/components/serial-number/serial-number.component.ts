@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { SerialmodalComponent } from '../serialmodal/serialmodal.component';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
 import { ERROR_MESSAGE } from 'src/app/constants/pages/App-settings';
+import { SerialmodalService } from '../serialmodal/serialmodal.service';
 
 @Component({
   selector: 'app-serial-number',
@@ -16,13 +17,19 @@ export class SerialNumberComponent  implements OnInit {
   selectedSerials:any;
   constructor(
     private modalController: ModalController,
-    private uiProvider:UiProviderService
+    private uiProvider:UiProviderService,
+    private serialmodalservice: SerialmodalService
   ) { }
 
   ngOnInit() {}
 
   async serialModal () {
     try {
+      const serialList = await this.serialmodalservice.SerialNumberList(this.poItem?.ItemNumber);
+      if(!serialList.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_SERIALS);
+        return;
+      }
       if(!this.poItem.QTY) {
         this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_QTY)
         return;

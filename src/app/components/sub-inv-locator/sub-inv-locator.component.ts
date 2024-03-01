@@ -33,19 +33,17 @@ export class SubInvLocatorComponent implements OnInit {
     private modalController: ModalController,
     private uiProvider: UiProviderService
   ) {
-  }
-
-  ngOnInit() {
-    console.log({
-      poIem: this.poItem,
-    }, 'poItem');
     this.isSubInventoryRestricted = this.poItem && this.poItem.IsSubinventoryRestricted && this.poItem.IsSubinventoryRestricted.toLowerCase() === 'false' ? false : true;
     this.poItem && this.poItem.IsLocatorRestricted && this.poItem.IsLocatorRestricted.toLowerCase() === 'false' ? false : true;
     this.itemNumber = this.poItem ? this.poItem.ItemNumber : '';
     this.loadSubInvFromLocalDB();
-    this.subInventoryCode = this.poItem.DefaultSubInventoryCode;
+    this.subInventoryCode = this.poItem?.DefaultSubInventoryCode;
+  }
+  
+  ngOnInit() {
     if (this.subInventoryCode) {
       this.loadLocatorFromLocalDB();
+      this.emitSubInventory(this.subInventoryCode);
     }
   }
 
@@ -64,6 +62,8 @@ export class SubInvLocatorComponent implements OnInit {
         return;
       }
       this.emitSubInventory(validSubInv.subInventoryCode);
+      this.locator = '';
+      this.loadLocatorFromLocalDB();
 
     } catch (error) {
       console.error(error);
@@ -72,7 +72,29 @@ export class SubInvLocatorComponent implements OnInit {
 
   };
 
-  onChangeLocator (event: any) {
+  scanSubInventory (event: any) {
+    try {
+      if (!this.subInventories.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_SUB_INV);
+        this.subInventoryCode = '';
+        return;
+      };
+      const validSubInv = this.subInventories.find((subInv: any) => subInv.SubInventoryCode === event);
+      if (!validSubInv) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_VALID_SUB_INV);
+        this.subInventoryCode = '';
+        return;
+      }
+      this.emitSubInventory(validSubInv.subInventoryCode);
+      this.locator = ''
+      this.loadLocatorFromLocalDB();
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  onChangeLocator(event: any) {
     try {
       const value = event.target.value;
       if (!this.subInventoryCode) {
@@ -80,18 +102,41 @@ export class SubInvLocatorComponent implements OnInit {
         this.locator = ''
         return;
       }
-      if(!this.locatorRespose.length) {
+      if (!this.locatorRespose.length) {
         this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_LOCATORS);
         this.locator = '';
         return
       };
-      const validLocator = this.locatorRespose.find((locator:any) => locator.Locator === value);
-      if(!validLocator) {
+      const validLocator = this.locatorRespose.find((locator: any) => locator.Locator === value);
+      if (!validLocator) {
         this.uiProvider.showError(ERROR_MESSAGE.NOT_VALID_LOCATOR);
         this.locator = '';
         return
       }
       this.emitLocator(validLocator.Locator)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  scanLocator(event: any) {
+    try {
+      if (!this.subInventoryCode) {
+        this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_SUBINV);
+        this.locator = ''
+        return;
+      }
+      if (!this.locatorRespose.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_AVAILABLE_LOCATORS);
+        this.locator = '';
+        return
+      };
+      const validLocator = this.locatorRespose.find((locator: any) => locator.Locator === event);
+      if (!validLocator) {
+        this.uiProvider.showError(ERROR_MESSAGE.NOT_VALID_LOCATOR);
+        this.locator = '';
+        return
+      }
+      this.emitLocator(validLocator.Locator);
     } catch (error) {
       console.log(error);
     }
@@ -117,7 +162,9 @@ export class SubInvLocatorComponent implements OnInit {
       this.emitSubInventory(this.subInventoryCode);
 
     }
+    this.locator = '';
     this.loadLocatorFromLocalDB();
+
   };
 
   async loadSubInvFromLocalDB() {
@@ -136,6 +183,9 @@ export class SubInvLocatorComponent implements OnInit {
         this.locator = locatorResp[0].Locator
       }
       this.locatorRespose = locatorResp;
+      if(!this.locatorRespose.length) {
+        this.locator = 'N/A';
+      };
     } catch (error) {
       console.log(error)
     }
@@ -176,5 +226,9 @@ export class SubInvLocatorComponent implements OnInit {
       ...this.poItem,
       locator
     })
+  }
+
+  shouldDisplayLocatorModal () {
+    return this.subInventories?.length && this.locatorRespose?.length
   }
 }

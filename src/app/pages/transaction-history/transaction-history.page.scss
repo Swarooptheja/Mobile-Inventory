@@ -1,3 +1,21 @@
 ion-header {
     background-color: #08668d;
   };
+
+  ion-card {
+    --background: #eed8d8;
+    --color: #050908;
+  }
+  
+  ion-card-title {
+    --color: #192d2a;
+  }
+  
+  ion-card-subtitle {
+    --color: #2a3e3b;
+  }
+  .status_delete{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }

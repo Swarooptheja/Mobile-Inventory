@@ -10,15 +10,27 @@ export class HeaderComponent  implements OnInit {
   @Input('isBack') isBack: boolean = false;
   @Input('isHome') isHome: boolean = false;
   @Input('isMenu') isMenu: boolean = false;
+  @Input ('isSync') isSync: boolean = false;
+  @Input ('isLogOut') isLogOut: boolean = false;
   
 
-  @Output() onNavigateBack = new EventEmitter()
+  @Output() onNavigateBack = new EventEmitter();
+  @Output() onRefresh = new EventEmitter();
+  @Output() onLogOut = new EventEmitter();
   constructor() { }
 
   ngOnInit() {}
 
   navigateBack () {
     this.onNavigateBack.emit();
+  };
+
+  syncData () {
+    this.onRefresh.emit();
+  };
+
+  logOut () {
+    this.onLogOut.emit();
   }
 
 }

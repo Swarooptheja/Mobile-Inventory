@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SQLite, SQLiteObject } from '@awesome-cordova-plugins/sqlite/ngx';
-import { CONSTANTS, RESPONSIBILITIES, TABLE_NAME, TYPE_OF_APIS } from 'src/app/constants/pages/App-settings';
+import { CONSTANTS, QUERIES, RESPONSIBILITIES, TABLE_NAME, TYPE_OF_APIS } from 'src/app/constants/pages/App-settings';
 import { catchError, map, firstValueFrom } from 'rxjs';
 import { GlobalvariablesService } from '../globalvariables/globalvariables.service';
 import { Storage } from '@ionic/storage-angular'
 import { formatDate } from '@angular/common';
 import { GOODS_RECEIPT_QUERIES } from 'src/app/constants/queries';
+import { BodyParamsService } from '../body-params/body-params.service';
 
 interface ColumnObject {
   name: string;
@@ -19,16 +20,22 @@ interface ColumnObject {
 })
 export class OfflineDataService {
 
-  private database!: SQLiteObject
+  private database!: SQLiteObject;
+  headers: any;
   constructor(
     private sqlite: SQLite,
     private httpClient: HttpClient,
     private globalVar: GlobalvariablesService,
-    private storage: Storage
+    private storage: Storage,
+    private bodyParamsService: BodyParamsService
   ) {
-    this.initDbForSqulite();
+    this.initSqlLiteDB();
+  };
+
+  ngOnInit () {
+    this.headers = this.bodyParamsService.getHeaders();
   }
-  async initDbForSqulite() {
+  async initSqlLiteDB() {
     try {
       if (!this.database) {
         this.database = await this.sqlite.create({
@@ -43,6 +50,19 @@ export class OfflineDataService {
       console.error('Error initializing database:', error);
       throw new Error('Database initialization failed.');
     }
+  };
+
+  async deleteSqlLiteDB() {
+    try {
+      this.database = await this.sqlite.deleteDatabase({
+        name: 'my.db',
+        location: 'default'
+      });
+      console.log(this.database, 'Database Successfully Deleted');
+
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async createTableForAPI(isDeltaSync: boolean, TableName: string, url: string, fieldName: string, responsibilities: string, typeOfApi: string) {
@@ -50,65 +70,56 @@ export class OfflineDataService {
       let constructUrl: string = '';
       const invOrgId = this.globalVar.getInvOrgId();
       const businessUnitId = this.globalVar.getOrgId();
-
-      if (responsibilities === RESPONSIBILITIES.INVENTORY_ORG || responsibilities === RESPONSIBILITIES.GL_PERIODS) {
-        constructUrl = `${url}/${businessUnitId}`;
-      }
-      // OrganizationId along with lastsync time
-      else if (responsibilities === RESPONSIBILITIES.FROM_OPERATION || responsibilities === RESPONSIBILITIES.WIP_OPERATIONS || responsibilities === RESPONSIBILITIES.ITEM_REVISION || responsibilities === RESPONSIBILITIES.UOM_CONVERSION || responsibilities === RESPONSIBILITIES.ITEM || responsibilities === RESPONSIBILITIES.LOCATORS) {
-        constructUrl = `${url}/${invOrgId}/''`
-      } 
-      //Params only OrgnizationId 
-      else if (responsibilities === RESPONSIBILITIES.PURCHASING_PERIODS || responsibilities === RESPONSIBILITIES.ON_HAND_QUANTITY || responsibilities === RESPONSIBILITIES.DIRECT_ORG_TRANSFER || responsibilities === RESPONSIBILITIES.ACCOUNT_ALIAS || responsibilities === RESPONSIBILITIES.ACCOUNT) {
-         constructUrl = `${url}/${invOrgId}`
-      }
-      // Params as OrganizationId, lastrefresh, fullRefresh
-      else if (responsibilities === RESPONSIBILITIES.EMPLOYEE || responsibilities === RESPONSIBILITIES.SUB_INV || responsibilities ===RESPONSIBILITIES.RESTRICTED_SUB_INV || responsibilities === RESPONSIBILITIES.RESTRICTED_LOCATORS) {
-        constructUrl = `${url}/${invOrgId}/''/'Y'`
-     }
-
-     //Params as url
-     else if(responsibilities === RESPONSIBILITIES.REASON) {
-      constructUrl = `${url}`
-     }
-     //Params as BusinessUnitId and OrganizationId
-     else if(responsibilities === RESPONSIBILITIES.INVENTORY_PERIODS) {
-      constructUrl = `${url}/${businessUnitId}/${invOrgId}`
-     }
-     //Params as lastSyncTime and fullRefresh
-     else if (responsibilities === RESPONSIBILITIES.LOCATION) {
-      constructUrl = `${url}/''/'Y'`
-     } 
-     // Transaction API's
-     else if (responsibilities === RESPONSIBILITIES.GOODS_RECEIPT_DOCS_RECEIVING) {
-       if(isDeltaSync) {
-        const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME)
-         constructUrl = `${url}/${invOrgId}/${lastSyncTime}/''`
+        if (responsibilities === RESPONSIBILITIES.INVENTORY_ORG || responsibilities === RESPONSIBILITIES.GL_PERIODS) {
+          constructUrl = `${url}/${businessUnitId}`;
         }
-      this.storage.set(CONSTANTS.LAST_SYNC_TIME,formatDate(new Date(), 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
-      console.log(formatDate(new Date, 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
-      constructUrl = `${url}/${invOrgId}/''/'Y'`
-     }
-     else if (responsibilities === RESPONSIBILITIES.SERIALS) {
-      if(isDeltaSync) {
-        const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME)
-        constructUrl = `${url}/${invOrgId}/${lastSyncTime}/""/""`
-      }
-      constructUrl = `${url}/${invOrgId}/""/""/""`
-     }
-     else if (responsibilities === RESPONSIBILITIES.LOT) {
-      if(isDeltaSync) {
-        const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME)
-        constructUrl = `${url}/${invOrgId}/${lastSyncTime}`
-      }
-      constructUrl = `${url}/${invOrgId}/""`
-     }
+        // OrganizationId along with lastsync time
+        else if (responsibilities === RESPONSIBILITIES.FROM_OPERATION || responsibilities === RESPONSIBILITIES.WIP_OPERATIONS || responsibilities === RESPONSIBILITIES.ITEM_REVISION || responsibilities === RESPONSIBILITIES.UOM_CONVERSION || responsibilities === RESPONSIBILITIES.ITEM || responsibilities === RESPONSIBILITIES.LOCATORS) {
+          constructUrl = `${url}/${invOrgId}/''`
+        }
+        //Params only OrgnizationId 
+        else if (responsibilities === RESPONSIBILITIES.PURCHASING_PERIODS || responsibilities === RESPONSIBILITIES.ON_HAND_QUANTITY || responsibilities === RESPONSIBILITIES.DIRECT_ORG_TRANSFER || responsibilities === RESPONSIBILITIES.ACCOUNT_ALIAS || responsibilities === RESPONSIBILITIES.ACCOUNT) {
+          constructUrl = `${url}/${invOrgId}`
+        }
+        // Params as OrganizationId, lastrefresh, fullRefresh
+        else if (responsibilities === RESPONSIBILITIES.EMPLOYEE || responsibilities === RESPONSIBILITIES.SUB_INV || responsibilities === RESPONSIBILITIES.RESTRICTED_SUB_INV || responsibilities === RESPONSIBILITIES.RESTRICTED_LOCATORS) {
+          constructUrl = `${url}/${invOrgId}/''/'Y'`
+        }
+
+        //Params as url
+        else if (responsibilities === RESPONSIBILITIES.REASON) {
+          constructUrl = `${url}`
+        }
+        //Params as BusinessUnitId and OrganizationId
+        else if (responsibilities === RESPONSIBILITIES.INVENTORY_PERIODS) {
+          constructUrl = `${url}/${businessUnitId}/${invOrgId}`
+        }
+        //Params as lastSyncTime and fullRefresh
+        else if (responsibilities === RESPONSIBILITIES.LOCATION) {
+          constructUrl = `${url}/''/'Y'`
+        }
+        // Transaction API's
+        else if (responsibilities === RESPONSIBILITIES.GOODS_RECEIPT_DOCS_RECEIVING) {
+          let currentDate = new Date();
+          currentDate.setHours(currentDate.getHours()-12);
+          this.storage.set(CONSTANTS.LAST_SYNC_TIME, formatDate(currentDate, 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
+          console.log(formatDate(new Date, 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
+          constructUrl = `${url}/${invOrgId}/''/'Y'`
+        }
+        else if (responsibilities === RESPONSIBILITIES.SERIALS) {
+          constructUrl = `${url}/${invOrgId}/""/""/""`
+        }
+        else if (responsibilities === RESPONSIBILITIES.LOT) {
+          constructUrl = `${url}/${invOrgId}/""`;
+        }
+
+      
 
 
 
       if (typeOfApi === TYPE_OF_APIS.REGULAR) {
         //Calling metadataUrls of all apis if it is regular
-        const metadataResp = await firstValueFrom(this.getMetadataResponseFromMasterAPI(url));
+        const metadataResp = await firstValueFrom(this.getMetadataResponseFromAPI(url));
         //creating a table
         const createTableQuery = this.creatingTable(TableName, metadataResp);
         await this.database.executeSql(createTableQuery, []);
@@ -119,7 +130,7 @@ export class OfflineDataService {
           await this.insertDataIntoTable(response[fieldName], TableName);
           return response;
         }
-      } else if(typeOfApi === TYPE_OF_APIS.TABLETYPE) {
+      } else if (typeOfApi === TYPE_OF_APIS.TABLETYPE) {
         // Never call a metadataUrls for Tabletype API's
         const tableTypeResp = await firstValueFrom(this.getResponseFromTableTypeApi(constructUrl));
         const metadataResp = this.convertToMetadata(tableTypeResp);
@@ -133,57 +144,94 @@ export class OfflineDataService {
           return convertcsvToJson;
         }
       } else {
-        if(fieldName){
-          const metadataResp = await firstValueFrom(this.getMetadataResponseFromMasterAPI(url));
-          const createTableQuery = this.creatingTable(TableName, metadataResp);
-          await this.database.executeSql(createTableQuery, []);
-          console.log(`${TableName} table is created Successfully`);
-          const response: any = await firstValueFrom(this.getReponseFromAPI(constructUrl));
-          // For creating a table for Transactions
-          await this.database.executeSql(GOODS_RECEIPT_QUERIES.RECEIPT.CREATE_TRANSACTIONS_TABLE, []);
-          console.log('Transaction Table is created')
-          if (response) {
-            await this.insertDataIntoTable(response[fieldName], TableName);
-            return response;
+        if (fieldName) {
+          if (!isDeltaSync) {
+            const metadataResp = await firstValueFrom(this.getMetadataResponseFromAPI(url));
+
+            const createTableQuery = this.creatingTable(TableName, metadataResp);
+
+            await this.database.executeSql(createTableQuery, []);
+            console.log(`${TableName} table is created Successfully`);
+            const response: any = await firstValueFrom(this.getReponseFromAPI(constructUrl));
+            // For creating a table for Transactions
+            await this.database.executeSql(GOODS_RECEIPT_QUERIES.RECEIPT.CREATE_TRANSACTIONS_TABLE, []);
+            console.log('Transaction Table is created')
+            if (response) {
+              await this.insertDataIntoTable(response[fieldName], TableName);
+              return response;
+            }
+          } else {
+            const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME);
+            let currentDate = new Date();
+            currentDate.setHours(currentDate.getHours()-12);
+            if (responsibilities === RESPONSIBILITIES.GOODS_RECEIPT_DOCS_RECEIVING) {
+              this.storage.set(CONSTANTS.LAST_SYNC_TIME, formatDate(currentDate, 'dd-MMM-yyyy HH:mm:ss', 'en-US'));
+              constructUrl = `${url}/${invOrgId}/${lastSyncTime}/'N'`
+            }
+            const response: any = await firstValueFrom(this.getReponseFromAPI(constructUrl));
+
+            if (response) {
+              await this.deleteRecordandUpdateDeltaSyncAPIs(response[fieldName], TableName);
+              return response;
+            }
+
           }
 
         } else {
-             const tableTypeResp = await firstValueFrom(this.getResponseFromTableTypeApi(constructUrl));
-             const metadataResp = this.convertToMetadata(tableTypeResp);
-             const createTableQuery = this.creatingTable(TableName, metadataResp);
-             await this.database.executeSql(createTableQuery, []);
-             if (tableTypeResp) {
+          const lastSyncTime = await this.storage.get(CONSTANTS.LAST_SYNC_TIME);
+          if (isDeltaSync && responsibilities === RESPONSIBILITIES.SERIALS) {
+            constructUrl = `${url}/${invOrgId}/${lastSyncTime}/""/""`
+          }
+          else if (isDeltaSync && responsibilities === RESPONSIBILITIES.LOT) {
+            constructUrl = `${url}/${invOrgId}/${lastSyncTime}`
+          }
+
+          const tableTypeResp = await firstValueFrom(this.getResponseFromTableTypeApi(constructUrl));
+          const metadataResp = this.convertToMetadata(tableTypeResp);
+
+          if (!isDeltaSync) {
+            const createTableQuery = this.creatingTable(TableName, metadataResp);
+            await this.database.executeSql(createTableQuery, []);
+            if (tableTypeResp) {
               const convertcsvToJson = this.csvToJson(tableTypeResp);
               await this.insertDataIntoTable(convertcsvToJson, TableName);
               return convertcsvToJson;
             }
+          }
+          if (tableTypeResp) {
+            const convertcsvToJson = this.csvToJson(tableTypeResp);
+            await this.deleteRecordandUpdateDeltaSyncAPIs(convertcsvToJson, TableName);
+            return convertcsvToJson;
+          }
         }
       }
-      
+
     } catch (error) {
       console.log(error);
     }
   }
 
   creatingTable(tableName: any, matadataArray: any) {
-    // starting create table query
     let createQuery = "CREATE TABLE IF NOT EXISTS " + tableName + "(";
     let primaryKeyQuery = "PRIMARY KEY (";
     let isPrimaryKeyAvailable = false;
-    let propertyArray = matadataArray.filter((v: any, i: any, a: any) => a.findIndex((t: any) => (t.name === v.name)) === i);
-    // iterating metadata converting field name, field type to sqlite types and query text
+    const metadataSet = new Set();
+    const propertyArray = matadataArray.filter((item: any) => {
+      const isDuplicate = metadataSet.has(item.name);
+      metadataSet.add(item.name);
+      return !isDuplicate;
+    })
     for (let i = 0; i < propertyArray.length; i++) {
       const field = propertyArray[i];
       let type = field.type;
       if (type.toLowerCase() === "number") {
-        // if number type from server convert to INTEGER sqlite type
         type = "INTEGER";
       } else if (type.toLowerCase() === "string") {
         type = "TEXT";
       } else {
         type = "TEXT";
       }
-      createQuery = createQuery + field.name + " " + type; // appening field name field type ex: "ID INTEGER
+      createQuery = createQuery + field.name + " " + type;
       if (field.primarykey || field.primaryKey) {
         isPrimaryKeyAvailable = true;
         primaryKeyQuery = primaryKeyQuery + field.name;
@@ -224,10 +272,10 @@ export class OfflineDataService {
 
             return "'" + element.replace(/'/g, "") + "'";
           }
-          if(typeof element === 'object') {
+          if (typeof element === 'object') {
             return "''"
           }
-          if(typeof element === 'number') {
+          if (typeof element === 'number') {
             return element;
           }
           return element.replace(/'/g, "");
@@ -248,10 +296,10 @@ export class OfflineDataService {
   }
 
 
-  getMetadataResponseFromMasterAPI(url: string) {
+  getMetadataResponseFromAPI(url: string) {
     try {
-      const metadataUrl = `${url}/metadata`
-      return this.httpClient.request('GET', metadataUrl, { 'headers': { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Language': 'en-US', 'Authorization': 'Basic c3lzYWRtaW46U3F1ZWV6ZUAzMjE=' } })
+      const metadataUrl = `${url}/metadata`;
+      return this.httpClient.request('GET', metadataUrl, { 'headers': this.headers})
     } catch (error) {
       console.log(error)
       throw new Error("error")
@@ -260,7 +308,7 @@ export class OfflineDataService {
   getResponseFromTableTypeApi(url: string) {
     try {
       const metadataUrl = `${url}`
-      return this.httpClient.request('GET', metadataUrl, { 'headers': { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Language': 'en-US', 'Authorization': 'Basic c3lzYWRtaW46U3F1ZWV6ZUAzMjE=' } })
+      return this.httpClient.request('GET', metadataUrl, { 'headers': this.headers })
     } catch (error) {
       console.log(error)
       throw new Error("error")
@@ -271,7 +319,7 @@ export class OfflineDataService {
   getReponseFromAPI(url: string) {
     console.log(url, 'construct url')
     try {
-      return this.httpClient.request('GET', url, { 'headers': { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Language': 'en-US', 'Authorization': 'Basic c3lzYWRtaW46U3F1ZWV6ZUAzMjE=' } })
+      return this.httpClient.request('GET', url, { 'headers': this.headers})
     } catch (error) {
       console.log(error)
       throw new Error("error")
@@ -288,9 +336,9 @@ export class OfflineDataService {
       throw error;
     }
   }
-  async executeQueryWithParams(query: string, params:any):Promise<any> {
+  async executeQueryWithParams(query: string, params: any): Promise<any> {
     try {
-      const executeQueryResponse = await this.executeQuery(query,params);
+      const executeQueryResponse = await this.executeQuery(query, params);
       const data = executeQueryResponse ? this.extractData(executeQueryResponse) : [];
       console.warn(data, 'insideparams')
       return data;
@@ -353,9 +401,94 @@ export class OfflineDataService {
   }
 
 
-  
+  async deleteQuery(query: any, params: any) {
+    try {
+      await this.database.executeSql(query, params);
+      console.log('deleted successfully')
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
+  async updateQuery(query: any, Params: any) {
+    try {
+      const updateHistory = await this.database.executeSql(query, Params);
+      console.log('update data successfully')
+    } catch (error) {
+      console.error(error);
 
+    }
+  }
 
+  async updateDeltaSyncAPIs(Response: any, TableName: any) {
+    try {
+      const query = QUERIES.GOODS_RECEIPT.UPDATE_PURCHASE_ORDER_LIST;
+      await this.database.executeSql(query)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async deleteRecordandUpdateDeltaSyncAPIs(Response: any, TableName: any) {
+    try {
+      if (TableName === TABLE_NAME.GOODS_RECEIPT_DOCS_RECEIVING) {
+        const query = QUERIES.GOODS_RECEIPT.DELETE_PURCHASE_ORDER_LIST;
+        for (const data of Response) {
+          if (data.Flag === 'D') {
+            const params: any = [
+              data?.OrderLineId,
+              data?.PoLineLocationId,
+              data?.ShipmentLineId
+            ];
+            await this.database.executeSql(query, params)
+          } else {
+            await this.insertDataIntoTable(Response, TableName);
+            const params: any = [
+              data?.QtyOrdered,
+              data?.QtyReceived,
+              data?.QtyRemaining,
+              data?.OrderLineId,
+              data?.PoLineLocationId,
+              data?.ShipmentLineId
+            ];
+            await this.updateQuery(QUERIES.GOODS_RECEIPT.UPDATE_PURCHASE_ORDER_LIST, params)
+          }
+        }
+      }
+      if (TableName === TABLE_NAME.SERIALS) {
+        const query = QUERIES.SERIALS.DELETE;
+        for (const data of Response) {
+          if (data.Flag === 'D') {
+            const params: any = [
+              data?.RowId
+            ];
+            await this.database.executeSql(query, params)
+          } else {
+            await this.insertDataIntoTable(Response, TableName);
+            await this.updateQuery(QUERIES.SERIALS.UPDATE,[])
+          }
+        }
+      }
+      if (TableName === TABLE_NAME.LOT) {
+        const query = QUERIES.LOT.DELETE;
+        for (const data of Response) {
+          if (data.Flag === 'D') {
+            const params: any = [
+              data?.ChildLot,
+              data?.ItemId,
+              data?.LocatorId,
+              data?.LpnId,
+              data?.SubInventoryCode
+            ];
+            await this.database.executeSql(query, params);
+          } else {
+            await this.insertDataIntoTable(Response, TableName);
+            await this.updateQuery(QUERIES.LOT.UPDATE,[])
+          }
+        }
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }

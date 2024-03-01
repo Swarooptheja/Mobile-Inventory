@@ -10,13 +10,12 @@ export class TransactionalApiDataService {
   constructor(
     private fetchapiData: FetchApiDataService
   ) { }
-
-  syncTransactionDataAPIs(isDeltaSync: boolean) {
+   syncTransactionDataAPIs(isDeltaSync: boolean) {
     let promiseArray: any = [
-      { presentApi: this.getDocsForReceiving(isDeltaSync), apimessage: API_CALLS_MESSAGES.goods_receipt_docs_receiving },
-      {presenApi: this.getSerialTableType(isDeltaSync), apimessage: API_CALLS_MESSAGES.serials},
-      {presenApi: this.getLotTableType(isDeltaSync), apimessage: API_CALLS_MESSAGES.lot},      
-        ];
+      { presentApi:  this.getDocsForReceiving(isDeltaSync), apimessage: API_CALLS_MESSAGES.goods_receipt_docs_receiving },
+      {presenApi:  this.getSerialTableType(isDeltaSync), apimessage: API_CALLS_MESSAGES.serials},
+      {presenApi:  this.getLotTableType(isDeltaSync), apimessage: API_CALLS_MESSAGES.lot},      
+        ]
 
     return promiseArray;
   }

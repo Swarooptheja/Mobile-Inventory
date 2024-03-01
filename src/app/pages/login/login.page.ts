@@ -9,7 +9,6 @@ import { GlobalvariablesService } from 'src/app/providers/globalvariables/global
 import { Storage } from '@ionic/storage-angular';
 import { NavController } from '@ionic/angular';
 import { MasterApiDataService } from 'src/app/providers/All-apis/master-api-data.service';
-import {OfflineDataService} from 'src/app/providers/offline/offline-data.service'
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -45,34 +44,24 @@ export class LoginPage implements OnInit {
     // For Testing:
      this.account.username = 'manideep j';
      this.account.password = 'manudj';
-
-    if (this.savecredentials == null || this.savecredentials == undefined || this.savecredentials == false || this.savecredentials == "") {
-			this.storage.set('savedUsername', "");
-			this.storage.set('savedPassword', "");
-		}
     if(this.networkProvider.isOnline()){
+      // If user attempt login without giving username
      if (this.account.username === "") {
-      // this.uiProvider.dismissLoader();
-      // this.alertProvider.usernameAlert().then((usernameAlert)=>{
-      //   usernameAlert.present();
-      // })
       this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_USERNAME);
       return;
      };
 
-     if(this.account.password === "" && isSSO ==="N") {
-      // this.uiProvider.dismissLoader();
-      // this.alertProvider.passwordAlert().then((passwordAlert)=>{
-      //   passwordAlert.present();
-      // });
+      // If user attempt login without giving password
+     if(this.account.password === "") {
       this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_PASSWORD);
       return;
      };
+     
      this.uiProvider.getCustomLoader(MESSAGE.PLEASE_WAIT)
      let userdata = this.bodyParamsProvider.getLoginBodyParams(this.account.username.trim(), this.account.password.trim(), isSSO)
      let loginUrl = Appsettings.loginURL;
 
-     this.loginService.getLoginData(userdata, loginUrl, "Login").subscribe(async (loginResponse)=>{
+     this.loginService.getLoginData(userdata, loginUrl).subscribe(async (loginResponse:any)=>{
       if(!loginResponse) {
        this.uiProvider.dismissLoader();
        this.uiProvider.showError(ERROR_MESSAGE.SERVER_ERROR);
@@ -80,7 +69,7 @@ export class LoginPage implements OnInit {
       } else{
         let loginResult = loginResponse.data
         if (loginResult && loginResult.length > 0 && (loginResult[0].STATUS == '1' || loginResult[0].STATUS == 1)){
-          let orgId = loginResult.filter((response:any)=>{
+          const orgId = loginResult.filter((response:any)=>{
             return response.DEFAULT_ORG_ID !=="";
           })
           const userId = loginResult.filter((response:any)=>{
@@ -108,21 +97,17 @@ export class LoginPage implements OnInit {
           }
           this.storage.set('userDetails',loginResult);
           this.storage.set('username', this.account.username);
-          this.storage.set('password', this.account.password);
           this.globalvar.setUsername(this.account.username)
           this.uiProvider.dismissLoader();
-          if (this.savecred == true) {
-            this.storage.set('savecredentials', true);
-          } else {
-            this.storage.set('savecredentials', false);
-          }
+         
           if (!JSON.parse(this.globalvar.getAllUserOrganization())) {
-            this.storage.get('userDetails').then((userDetails) => {
-              this.uiProvider.showSuccess(MESSAGE.LOGIN_SUCCESS);
-              this.navCtrl.navigateForward(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST,{ queryParams: userDetails })
-            });
+              await this.uiProvider.showSuccess(MESSAGE.LOGIN_SUCCESS);
+              await this.uiProvider.dismissSuccess()
+              this.navCtrl.navigateForward(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST);
           } else{
-
+            await this.uiProvider.showSuccess(MESSAGE.PLEASE_WAIT);
+            await this.uiProvider.dismissSuccess();
+            this.navCtrl.navigateForward(ROUTE_PATHS.ACTIVITY)
           }
         } else if (loginResult && loginResult.length > 0 && (loginResult[0].STATUS === '0' || loginResult[0].STATUS === '2')) {
           this.uiProvider.dismissLoader();

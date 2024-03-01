@@ -15,31 +15,17 @@ export class LoginService {
     private uiProvider: UiProviderService
   ) { }
 
-  getLoginData(userdata: any, url: any, servicename: string) {
+  getLoginData(userdata: any, url: any): any {
     try {
-      console.log(url, "url");
       let body = JSON.stringify(userdata);
-  
-      console.warn({
-        url,
-        userdata
-      });
-  
-      return this.httpclient.request('POST', url, { 'body': body, 'headers': { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Content-Language': 'en-US', 'Authorization': 'Basic c3lzYWRtaW46U3F1ZWV6ZUAzMjE=' } }).pipe(
-        timeout(2*60*1000),
-        tap((data: any) => {
-          console.log(data, 'data');
-        }),
-        catchError((error) => {
-          this.uiProvider.showError('we are unable to load data in login');
-          console.log(error);
-          return throwError(error);
-        })
+      const header = this.bodyParams.getHeaders();
+      return this.httpclient.request('POST', url, { 'body': body, 'headers': header}).pipe(
+        timeout(2*60*1000)
       );
     } catch (error) {
       this.uiProvider.showError('An unexpected error occurred');
       console.log(error);
-      return throwError(error);
+     
     }
   }
 }

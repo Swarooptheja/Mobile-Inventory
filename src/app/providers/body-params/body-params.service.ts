@@ -10,22 +10,18 @@ export class BodyParamsService {
 
   //login method
   getLoginBodyParams(username: string, password: string, isSSO: string) {
-    return {
+    return ({
       username: username,
       password: password,
       isSSO: isSSO || "N"
-    };
+    });
   }
 
-  getHeaders(body: any) {
+  getHeaders() {
     return ({
-      body: body,
-      headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Content-Language': 'en-US',
-        'Authorization': 'Basic c3lzYWRtaW46U3F1ZWV6ZUAzMjE='
-      }
     })
   }
 }

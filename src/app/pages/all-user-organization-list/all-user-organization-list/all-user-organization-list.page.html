@@ -10,6 +10,9 @@
 
 
 <ion-content #content class="list-page-content">
+  <ion-refresher slot="fixed" (ionRefresh)="onPullRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <div class="list-page-content-org" *ngFor="let item of organizationList | filter:searchText index as i" (click)="selectOrg(item)">
     <div style="display: flex; gap: 40px;">
       <div class="list-page-content-icon"> <ion-icon *ngIf="item.checked || selectedOrgCode === item.InventoryOrgCode" name="checkmark-circle" class="icon-inner" size="large">

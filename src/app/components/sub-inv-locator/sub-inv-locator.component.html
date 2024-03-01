@@ -10,7 +10,11 @@
             [(ngModel)]="subInventoryCode" (ionChange)="onChangeSubInventory($event)"></ion-input>
         </ion-col>
         <ion-col col-4>
-          <ion-icon name="chevron-forward-outline"(click)="subInventoryModal()" size="large"></ion-icon>
+          <ion-icon name="chevron-forward-outline" (click)="subInventoryModal()" size="large"></ion-icon>
+        </ion-col>
+        <ion-col>
+          <app-barcode-scanner  (scanItem)="scanSubInventory($event)">
+          </app-barcode-scanner>
         </ion-col>
       </ion-row>
     </ion-col>
@@ -25,8 +29,12 @@
           <ion-input class="min-serial-input input-box" type="text" [placeholder]="'Select Loc'"
             [(ngModel)]="locator" (ionChange)="onChangeLocator($event)" ></ion-input>
         </ion-col>
-        <ion-col col-4>
+        <ion-col col-4 *ngIf="shouldDisplayLocatorModal()">
           <ion-icon name="chevron-forward-outline" (click)="locatorModal()" size="large"></ion-icon>
+        </ion-col>
+        <ion-col>
+          <app-barcode-scanner  (scanItem)="scanLocator($event)">
+          </app-barcode-scanner>
         </ion-col>
       </ion-row>
     </ion-col>

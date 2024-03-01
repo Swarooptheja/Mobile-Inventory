@@ -1,10 +1,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
+import { ERROR_MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { ActivatedRoute } from '@angular/router';
 import { GoodsReceiptDataService } from '../goods-receipt-po-list/goods-receipt-data.service';
-
+import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
 @Component({
   selector: 'app-goods-receipt-items',
   templateUrl: './goods-receipt-items.page.html',
@@ -17,12 +17,13 @@ export class GoodsReceiptItemsPage implements OnInit {
   searchText: string = '';
   selectedPurchaseOrder: any;
   receiptPurchaseOrderItems:any =[];
-  showSearchBar:boolean = false;
+  scanText: string = '';
 
   constructor(
     private navCtrl: NavController,
     private route: ActivatedRoute,
-    private goodsReceiptDataService: GoodsReceiptDataService
+    private goodsReceiptDataService: GoodsReceiptDataService,
+    private uiProvider: UiProviderService
   ) {
     this.route.queryParams.subscribe((params:any)=>{
       this.selectedPurchaseOrder = params;
@@ -36,6 +37,36 @@ export class GoodsReceiptItemsPage implements OnInit {
   ionViewWillEnter(): void {
     console.log(this.selectedPurchaseOrder, 'ionviewenter');
     this.getReceiptPurchaseOrderItems();
+  }
+
+  onPullRefresh(event: any) {
+    setTimeout(() => {
+      this.getReceiptPurchaseOrderItems();
+      event.target.complete();
+    }, 3000);
+
+  };
+
+
+  scanItemNumber(event: any) {
+    try {
+      const selectedPoLineItem = this.receiptPurchaseOrderItems.filter((item: any) => item.ItemNumber === event);
+      if (!selectedPoLineItem.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.INVALID_ITEM_NUM);
+        return;
+      };
+      // let selectedPoLineItem = this.receiptPurchaseOrderItems[index];
+      this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEM_DETAILS_PAGE, {
+        queryParams: {
+          selectedPoLineItem: selectedPoLineItem[0], 
+          // selectedIndex: index,
+          // receiptPurchaseOrderItems: this.receiptPurchaseOrderItems
+        }
+      })
+    } catch (error) {
+      console.error(error);
+
+    }
   }
 
   async getReceiptPurchaseOrderItems() {
@@ -59,9 +90,6 @@ export class GoodsReceiptItemsPage implements OnInit {
     this.searchText = event.target.value;
   }
 
-  toggleSearch() {
-    this.showSearchBar = true;
-  }
 
   goToGoodsReceiptItemDetails(receiptPurchseOrderItem:any, index:number) {
     let selectedPoLineItem = this.receiptPurchaseOrderItems[index];

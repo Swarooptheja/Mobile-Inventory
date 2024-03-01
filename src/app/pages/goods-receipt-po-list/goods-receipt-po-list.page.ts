@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { CONSTANTS, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
+import { CONSTANTS, ERROR_MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { GoodsReceiptDataService } from './goods-receipt-data.service';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
 
 @Component({
   selector: 'app-goods-receipt-po-list',
@@ -16,20 +17,25 @@ export class GoodsReceiptPoListPage implements OnInit {
    goodsReceiptList:any = [];
    page:number = 1;
    isEnableInfiniteScroll: boolean = true;
+   scanText:any;
   constructor(
     private navCtrl: NavController,
-    private goodsReceiptDataService: GoodsReceiptDataService
+    private goodsReceiptDataService: GoodsReceiptDataService,
+    private uiProvider: UiProviderService
   ) { 
     this.getReceiptPurchseOrderList();
-
   }
 
   ngOnInit() {
   };
 
-  // ionViewDidLoad (): void {
-  //   this.getReceiptPurchseOrderList();
-  // }
+  onPullRefresh(event: any) {
+    setTimeout(() => {
+      this.getReceiptPurchseOrderList();
+      event.target.complete();
+    }, 2000);
+
+  };
   
   async getReceiptPurchseOrderList() {
     try {
@@ -42,6 +48,23 @@ export class GoodsReceiptPoListPage implements OnInit {
     } catch (error) {
       console.log(error);
     }     
+  }
+
+  // toggleSearch() {
+  // }
+
+  async scanPONumber(event: any) {
+    try {
+      const selectPurchaseOrder = await this.goodsReceiptDataService.getReceiptPurchaseOrdersListFromDB(event, this.page);
+      if (!selectPurchaseOrder.length) {
+        this.uiProvider.showError(ERROR_MESSAGE.INVALID_PO_NUM);
+        return;
+      };
+      this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEMS_PAGE, { queryParams: selectPurchaseOrder[0] });
+
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   goBackToPreviousPage (){
