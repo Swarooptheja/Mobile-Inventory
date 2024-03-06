@@ -15,15 +15,15 @@ import { MasterApiDataService } from 'src/app/providers/All-apis/master-api-data
   styleUrls: ['./login.page.scss'],
 })
 
-export class LoginPage implements OnInit {
+export class LoginPage  {
   showPassword: boolean = false;
-  account:any = {}
-  savecredentials: any;
-  savecred: boolean = false;
+  account:any = {
+    username: '',
+    password: ''
+  };
   constructor(
     private networkProvider: NetworkproviderService,
     private uiProvider: UiProviderService,
-    private alertProvider:AlertsService,
     private bodyParamsProvider: BodyParamsService,
     private loginService: LoginService,
     private globalvar: GlobalvariablesService,
@@ -31,101 +31,96 @@ export class LoginPage implements OnInit {
     private navCtrl : NavController,
     private masterdataservice: MasterApiDataService
   ) {
-    this.account.username = '',
-    this.account.password = ''
    }
 
-  ngOnInit() {
-  };
+
   passwordVisibility() {
     this.showPassword = !this.showPassword;
   }
   async login(isSSO = "N") {
     // For Testing:
-     this.account.username = 'manideep j';
-     this.account.password = 'manudj';
-    if(this.networkProvider.isOnline()){
+    this.account.username = 'manideep j';
+    this.account.password = 'manudj';
+    if (this.networkProvider.isOnline()) {
       // If user attempt login without giving username
-     if (this.account.username === "") {
-      this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_USERNAME);
-      return;
-     };
+      if (this.account.username === "") {
+        this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_USERNAME);
+        return;
+      };
 
       // If user attempt login without giving password
-     if(this.account.password === "") {
-      this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_PASSWORD);
-      return;
-     };
-     
-     this.uiProvider.getCustomLoader(MESSAGE.PLEASE_WAIT)
-     let userdata = this.bodyParamsProvider.getLoginBodyParams(this.account.username.trim(), this.account.password.trim(), isSSO)
-     let loginUrl = Appsettings.loginURL;
-
-     this.loginService.getLoginData(userdata, loginUrl).subscribe(async (loginResponse:any)=>{
-      if(!loginResponse) {
-       this.uiProvider.dismissLoader();
-       this.uiProvider.showError(ERROR_MESSAGE.SERVER_ERROR);
+      if (this.account.password === "") {
+        this.uiProvider.showError(ERROR_MESSAGE.PLEASE_ENTER_PASSWORD);
         return;
-      } else{
-        let loginResult = loginResponse.data
-        if (loginResult && loginResult.length > 0 && (loginResult[0].STATUS == '1' || loginResult[0].STATUS == 1)){
-          const orgId = loginResult.filter((response:any)=>{
-            return response.DEFAULT_ORG_ID !=="";
-          })
-          const userId = loginResult.filter((response:any)=>{
-            return response.USER_ID !=='';
-          })
-          const personId = loginResult.filter((response:any)=>{
-            return response.PERSON_ID !=='';
-          });
+      };
 
-          if(userId && userId.length > 0) {
-            this.globalvar.setUserId(userId[0].USER_ID)
+      this.uiProvider.getCustomLoader(MESSAGE.PLEASE_WAIT)
+      let userdata = this.bodyParamsProvider.getLoginBodyParams(this.account.username.trim(), this.account.password.trim(), isSSO)
+      let loginUrl = Appsettings.loginURL;
+
+      this.loginService.getLoginData(userdata, loginUrl).subscribe(async (loginResponse: any) => {
+        if (!loginResponse) {
+          // TODO: try to use guard-clauses
+          this.uiProvider.dismissLoader();
+          this.uiProvider.showError(ERROR_MESSAGE.SERVER_ERROR);
+          return;
+        }
+        const loginResult = loginResponse.data;
+        const isValidLogin = loginResult && loginResult.length > 0 && loginResult[0].STATUS.toString() === '1';
+        const isNotValidLogin = loginResult && loginResult.length > 0 && (loginResult[0].STATUS.toString() === '0' || loginResult[0].STATUS.toString() === '2')
+        if (isValidLogin) {
+
+          // TODO: can use 'find', if only first occurence is required;
+          const orgId = loginResult.find((response: any) => response.DEFAULT_ORG_ID);
+
+          const userId = loginResult.find((response: any) => response.USER_ID);
+
+          const personId = loginResult.find((response: any) => response.PERSON_ID);
+
+          if (userId) {
+            this.globalvar.setUserId(userId.USER_ID)
           }
-          if(personId && personId.length > 0 ) {
-            this.globalvar.setPersonId(personId[0].PERSON_ID);
-          }
-          
-          if(orgId && orgId.length > 0){
-            this.globalvar.setOrgId(orgId[0].DEFAULT_ORG_ID)
-          } else{
+          if (personId) {
+            this.globalvar.setPersonId(personId.PERSON_ID);
+          } 
+          if (!orgId) {
             this.uiProvider.dismissLoader();
             return;
-          }
-          if (!JSON.parse(this.globalvar.getAllUserOrganization())) {
+          };
+          this.globalvar.setOrgId(orgId.DEFAULT_ORG_ID);
+          const isUserOrgId = !JSON.parse(this.globalvar.getAllUserOrganization())
+          if (isUserOrgId) {
             await this.masterdataservice.getInventoryOrganizations(false)
           }
-          this.storage.set('userDetails',loginResult);
-          this.storage.set('username', this.account.username);
+          this.globalvar.setUserDetails(loginResult);
+          this.globalvar.setUserName(this.account.username)
           this.globalvar.setUsername(this.account.username)
           this.uiProvider.dismissLoader();
-         
-          if (!JSON.parse(this.globalvar.getAllUserOrganization())) {
-              await this.uiProvider.showSuccess(MESSAGE.LOGIN_SUCCESS);
-              await this.uiProvider.dismissSuccess()
-              this.navCtrl.navigateForward(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST);
-          } else{
+
+          if (isUserOrgId) {
+            await this.uiProvider.showSuccess(MESSAGE.LOGIN_SUCCESS);
+            await this.uiProvider.dismissSuccess()
+            this.navCtrl.navigateForward(ROUTE_PATHS.ALL_USER_ORGANIZATION_LIST);
+          } else {
             await this.uiProvider.showSuccess(MESSAGE.PLEASE_WAIT);
             await this.uiProvider.dismissSuccess();
             this.navCtrl.navigateForward(ROUTE_PATHS.ACTIVITY)
           }
-        } else if (loginResult && loginResult.length > 0 && (loginResult[0].STATUS === '0' || loginResult[0].STATUS === '2')) {
+        } else if (isNotValidLogin) {
           this.uiProvider.dismissLoader();
           this.uiProvider.showError(loginResult[0].ERROR);
-        } else{
+        } else {
           this.uiProvider.dismissLoader();
           this.uiProvider.showError(ERROR_MESSAGE.PLEASE_CHECK_CREDENTIALS);
         }
-      }
-     })
-      
-    }
-    else {
-      console.log('User in Offline mode')
-      this.uiProvider.showError(ERROR_MESSAGE.PLEASE_CHECK_YOUR_INTERNET_CONNECTION)
-    } 
-  }
+      });
 
+      return
+
+    }
+    console.log('User in Offline mode')
+    this.uiProvider.showError(ERROR_MESSAGE.PLEASE_CHECK_YOUR_INTERNET_CONNECTION)
+  }
 
 
 }

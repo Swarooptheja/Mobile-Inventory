@@ -24,7 +24,7 @@ export class LoginService {
       );
     } catch (error) {
       this.uiProvider.showError('An unexpected error occurred');
-      console.log(error);
+      console.error(error);
      
     }
   }

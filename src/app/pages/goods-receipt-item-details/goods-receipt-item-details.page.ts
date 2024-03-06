@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { ERROR_MESSAGE, MESSAGE, POST_TRANSACTION_DESTINATIONS, ROUTE_PATHS, TABLE_NAME } from 'src/app/constants/pages/App-settings';
+import { ERROR_MESSAGE, MESSAGE, POST_TRANSACTION_DESTINATIONS, RESPONSIBILITIES, RESPONSIBILITY, ROUTE_PATHS, TABLE_NAME } from 'src/app/constants/pages/App-settings';
 import { ActivatedRoute } from '@angular/router';
 import { IonicSlides } from '@ionic/angular';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
@@ -10,16 +10,23 @@ import { OfflineDataService } from 'src/app/providers/offline/offline-data.servi
 import { firstValueFrom } from 'rxjs';
 import { SyncDataService } from 'src/app/providers/All-apis/sync-data.service';
 
+interface ApiData<T> {
+  [key: string]: T
+};
+
+interface localApiData extends ApiData<any> {
+  QTY?: number;
+};
 @Component({
   selector: 'app-goods-receipt-item-details',
   templateUrl: './goods-receipt-item-details.page.html',
   styleUrls: ['./goods-receipt-item-details.page.scss'],
 })
-export class GoodsReceiptItemDetailsPage implements OnInit {
+export class GoodsReceiptItemDetailsPage {
   heading: string = 'Item Details Page'
   isBack: boolean = true;
   poSubItemDetails: any;
-  index: any;
+  index: number = 0;
   receiptPurchaseOrderItems: any = [];
   itemNumber: any;
   destination: any;
@@ -54,14 +61,8 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
     this.destination = this.poSubItemDetails.DestinationType;
   }
 
-  ngOnInit() {
-    console.log(this.destination, 'thejaswaroop')
-    console.log(this.receiptPurchaseOrderItems, 'receiptpurchaseorderitem')
-    console.log(this.poSubItemDetails, 'poSubItemDetails')
-  }
 
   goBackToPreviousPage() {
-    console.log('theja')
     this.navCtrl.back();
   }
 
@@ -103,30 +104,26 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
   }
 
   isSerialControlled(purchaseOrderItem: any): boolean {
-    return purchaseOrderItem.IsSerialControlled.toLowerCase() === 'true' ? true : false
+    return purchaseOrderItem.IsSerialControlled.toLowerCase() === 'true';
   }
 
   isLotControlled(purchaseOrderItem: any): boolean {
-    return purchaseOrderItem.IsLotControlled.toLowerCase() === 'true' ? true : false
+    return purchaseOrderItem.IsLotControlled.toLowerCase() === 'true';
   }
 
   onSelectLocator(event: any) {
     this.locator = event.locator
-    console.log(event, 'parantlocator')
   }
   onSelectSubInventory(event: any) {
     this.subInventory = event.subInventory;
-    console.log(event, 'parentsubinventory')
   }
 
   onSelectSerials(event: any) {
-    this.serials = event.selectedSerials
-    console.log(event, 'parent serials')
+    this.serials = event.selectedSerials;
   }
 
   onSelectLots(event: any) {
-    this.lots = event.selectedLots
-    console.log(event, 'parentlots')
+    this.lots = event.selectedLots;
   }
 
   async performPostTransaction(purchaseOrderItem: any, index: any) {
@@ -144,48 +141,73 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
         selectedSubInventory: this.subInventory,
         selectedLocator: this.locator
       };
-      const payload = await this.goodReceiptService.goodsReceiptPayload([currentPurchaseOrderItem]);
+      // const payload = await this.goodReceiptService.goodsReceiptPayload([currentPurchaseOrderItem]);
 
-      const transaction = this.goodReceiptService.saveTransactionHistory(currentPurchaseOrderItem);
+      const transaction = this.goodReceiptService.saveTransactionHistory(currentPurchaseOrderItem, RESPONSIBILITY.GOODS_RECEIPTS);
+
+      await this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
+
       purchaseOrderItem.QtyRemaining = parseInt(purchaseOrderItem.QTY, 10)
         ? (purchaseOrderItem.QtyRemaining - parseInt(purchaseOrderItem.QTY, 10))
         : purchaseOrderItem.QtyRemaining;
+
       if (this.networkService.isOnline()) {
-        const response: any = await firstValueFrom(this.goodReceiptService.performPostOperation(payload));
-
-        if (response && response['Response']) {
-          transaction.status = response['Response'][0].RecordStatus;
-          transaction.receiptInfo = response['Response'][0].ReceiptNumber;
-          transaction.error = response['Response'][0].Message
-        };
-        // Insert Transaction Data into table        
-        this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
-        
-        this.uiProvider.dismissLoader();
-        if (response && response['Response']) {
-          if (response['Response'][0].RecordStatus === 'S') {
-            await this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
-            const promiseArray = await this.syncDataService.getSync(true);
-
-            for (const { presenApi } of promiseArray) {
-              const response = await presenApi;
-              console.log(response, 'calling Delta Sync API')
-            };
+        const response = await this.goodReceiptService.postGoodsReceiptTransaction();
+        const result = await Promise.all(response);
+        result.forEach(async (res: any) => {
+          if (res.result === 'Success') {
+            this.uiProvider.dismissLoader();
+            this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+            await this.goodReceiptService.performDeltaSyncOperation();
             this.uiProvider.dismissSuccess();
             this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE)
             return;
+          } else if (res.result === 'Error') {
+            this.uiProvider.dismissLoader();
+            this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
+            await this.uiProvider.dismissSuccess();
+            this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
+            return;
+          } else {
+            this.uiProvider.dismissLoader();
+            this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
           }
-         await this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
-         await this.uiProvider.dismissSuccess();
-         this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
 
-          return;
-        }
-        return;
-      };
+        })
+        // const response: any = await firstValueFrom(this.goodReceiptService.performPostOperation(payload));
+
+        // if (response && response['Response']) {
+        //   transaction.status = response['Response'][0].RecordStatus;
+        //   transaction.receiptInfo = response['Response'][0].ReceiptNumber;
+        //   transaction.error = response['Response'][0].Message
+        // };
+        // Insert Transaction Data into table        
+
+        // this.uiProvider.dismissLoader();
+        // if (response && response['Response']) {
+        //   if (response['Response'][0].RecordStatus === 'S') {
+        //     await this.uiProvider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+        //     const promiseArray = await this.syncDataService.sync(true);
+
+        //     for (const { presenApi } of promiseArray) {
+        //       const response = await presenApi;
+        //       console.log(response, 'calling Delta Sync API')
+        //     };
+        //   this.uiProvider.dismissSuccess();
+        //   this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE)
+        //   return;
+      }
+      //  await this.uiProvider.showError(MESSAGE.TRANSACTION_FAILED);
+      //  await this.uiProvider.dismissSuccess();
+      //  this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
+
+      //   return;
+      // }
+      // return;
+      // };
       await this.uiProvider.dismissLoader();
       this.uiProvider.showSuccess(MESSAGE.SAVED_GOODS_RECEIPT_DATA_LOCALLY);
-      await this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
+      // await this.offlineDataService.insertDataIntoTable([transaction], TABLE_NAME.TRANSCTION_TABLE_RECEIPT);
       await this.uiProvider.dismissSuccess();
       this.navCtrl.navigateRoot(ROUTE_PATHS.GOODS_RECEIPT_PO_LIST_PAGE);
 
@@ -195,7 +217,7 @@ export class GoodsReceiptItemDetailsPage implements OnInit {
 
   }
 
-  checkAllValidations(purchaseOrderItem: any): any {
+  checkAllValidations(purchaseOrderItem: any): boolean {
     if (!purchaseOrderItem.QTY) {
       this.uiProvider.showError(ERROR_MESSAGE.PLEASE_SELECT_QTY);
       return false

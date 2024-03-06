@@ -61,7 +61,7 @@ export class AppComponent {
 
   async refreshInterval () {
     interval(CONSTANTS.performDeltaSync).subscribe(async ()=>{
-      const promiseArray = await this.syncDataService.getSync(true);
+      const promiseArray = await this.syncDataService.sync(true);
 
       for(const {presenApi} of promiseArray) {
         try {

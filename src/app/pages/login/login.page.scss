@@ -1,19 +1,21 @@
+app-login {
+    ion-content {
+        text-align: center;
+        margin: 0px;
 
-    ion-content{
-      text-align: center;
-      margin: 0px;
-     
     }
+
     // .bg_image{
     //   background-image: url('../../../assets/icon/bg.png');
     //   background-repeat: no-repeat;
     //   margin-top: -194px; // for Proppelapps logo
     //   // margin-top: -130px; // for GE Appliances logo
     // }
-    h2{
+    h2 {
         margin-top: 80px;
     }
-    .input{
+
+    .input {
         padding: 8px;
         border: none !important;
         border-bottom: 1px solid #ccc !important;
@@ -23,39 +25,43 @@
         background: transparent;
         color: #000;
         font-size: 18px;
-        outline:none !important;
+        outline: none !important;
     }
+
     ::placeholder {
-        color:rgb(50, 48, 48) !important; 
+        color: rgb(50, 48, 48) !important;
     }
-    .submit{
+
+    .submit {
         font-size: 18px;
         margin: 8px;
         border: 2px solid #08668d !important;
         border-radius: 2rem;
-        width:85%;
+        width: 85%;
         padding: 8px;
-        color: #fff ;
+        color: #fff;
         background: #08668d;
         font-weight: bold;
-        outline:none !important;
+        outline: none !important;
     }
-    .image{
+
+    .image {
         position: static;
         width: 70%;
         margin-top: 5%;
     }
-    .center-login-page{
+
+    .center-login-page {
         margin-top: 20% !important;
         display: flex;
         flex-direction: column;
-       
+
 
     }
-    .column{
+
+    .column {
         margin-bottom: 16%;
         justify-content: center;
     }
 
- 
-  
+}

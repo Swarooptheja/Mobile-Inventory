@@ -14,7 +14,7 @@ export class SyncDataService {
     private transactionDataService: TransactionalApiDataService
   ) { }
 
-  getSync(isDeltaSync: boolean) {
+  sync(isDeltaSync: boolean) {
     let promiseResult: any = [];
     if (!isDeltaSync) {
       promiseResult = [

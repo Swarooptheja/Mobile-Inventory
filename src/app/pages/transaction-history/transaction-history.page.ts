@@ -46,9 +46,9 @@ export class TransactionHistoryPage implements OnInit {
   }
 
   onPullRefresh(event: any) {
+    this.getTransactionHistoryData();
+    this.checkNetWorkStatus();
     setTimeout(() => {
-      this.getTransactionHistoryData();
-      this.checkNetWorkStatus();
       event.target.complete();
     }, 2000);
 

@@ -16,7 +16,7 @@ export class FetchApiDataService {
     try {
       return this.offlineData.createTableForAPI(isDeltaSync, TableName, url, fieldName, responsibilities, typeOfApi);
     } catch (error) {
-      console.log(error)
+      console.error(error)
     };
   };
 }

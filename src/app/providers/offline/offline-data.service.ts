@@ -207,7 +207,7 @@ export class OfflineDataService {
       }
 
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -296,33 +296,31 @@ export class OfflineDataService {
   }
 
 
-  getMetadataResponseFromAPI(url: string) {
+  getMetadataResponseFromAPI(url: string):any {
     try {
       const metadataUrl = `${url}/metadata`;
       return this.httpClient.request('GET', metadataUrl, { 'headers': this.headers})
     } catch (error) {
-      console.log(error)
-      throw new Error("error")
+      console.error(error)
+      
     }
   }
-  getResponseFromTableTypeApi(url: string) {
+  getResponseFromTableTypeApi(url: string): any {
     try {
       const metadataUrl = `${url}`
       return this.httpClient.request('GET', metadataUrl, { 'headers': this.headers })
     } catch (error) {
-      console.log(error)
-      throw new Error("error")
+      console.error(error)
     }
   }
 
 
-  getReponseFromAPI(url: string) {
+  getReponseFromAPI(url: string): any {
     console.log(url, 'construct url')
     try {
       return this.httpClient.request('GET', url, { 'headers': this.headers})
     } catch (error) {
-      console.log(error)
-      throw new Error("error")
+      console.error(error)
     }
   }
 
@@ -332,8 +330,8 @@ export class OfflineDataService {
       const data = executeQueryResponse ? this.extractData(executeQueryResponse) : [];
       return data;
     } catch (error) {
-      console.log(error);
-      throw error;
+      console.error(error);
+      return [];
     }
   }
   async executeQueryWithParams(query: string, params: any): Promise<any> {
@@ -343,8 +341,8 @@ export class OfflineDataService {
       console.warn(data, 'insideparams')
       return data;
     } catch (error) {
-      console.log(error);
-      throw error;
+      console.error(error);
+      return [];
     }
   }
 
@@ -368,7 +366,8 @@ export class OfflineDataService {
       console.log(data)
       return data;
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      return []
     }
   }
 
@@ -406,7 +405,7 @@ export class OfflineDataService {
       await this.database.executeSql(query, params);
       console.log('deleted successfully')
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 

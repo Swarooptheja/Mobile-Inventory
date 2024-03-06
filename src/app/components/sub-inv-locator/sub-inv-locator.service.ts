@@ -18,7 +18,7 @@ export class SubInvLocatorService {
       let query = QUERIES.RESTRICTED_SUBINVENTORY.GET;
       return this.offlineDataService.executeQueryWithParams(query, [this.globalVar.getInvOrgId(), itemNumber]);    
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -27,7 +27,7 @@ export class SubInvLocatorService {
       let query = QUERIES.RESTRICTED_LOCATOR.GET;
       return this.offlineDataService.executeQueryWithParams(query,[this.globalVar.getInvOrgId(), itemNumber]);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }         
   getSubInvenoryList(table:string):any {
@@ -39,7 +39,7 @@ export class SubInvLocatorService {
       return this.offlineDataService.executeQueryWithParams(query,[this.globalVar.getInvOrgId()]);
 
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   getLocatorList(subInventoryCode:any):any {
@@ -48,7 +48,7 @@ export class SubInvLocatorService {
       return this.offlineDataService.executeQueryWithParams(query, [subInventoryCode]);
 
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

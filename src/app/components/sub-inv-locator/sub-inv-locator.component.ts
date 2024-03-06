@@ -115,7 +115,7 @@ export class SubInvLocatorComponent implements OnInit {
       }
       this.emitLocator(validLocator.Locator)
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   scanLocator(event: any) {
@@ -138,7 +138,7 @@ export class SubInvLocatorComponent implements OnInit {
       }
       this.emitLocator(validLocator.Locator);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -172,7 +172,7 @@ export class SubInvLocatorComponent implements OnInit {
       const subInvResp = await this.subInvLocatorService.getSubInvenoryList(TABLE_NAME.SUBINVENTORY);
       this.subInventories = subInvResp;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
@@ -187,7 +187,7 @@ export class SubInvLocatorComponent implements OnInit {
         this.locator = 'N/A';
       };
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 

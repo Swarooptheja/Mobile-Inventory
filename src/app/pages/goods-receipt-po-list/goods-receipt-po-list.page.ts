@@ -10,33 +10,30 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
   templateUrl: './goods-receipt-po-list.page.html',
   styleUrls: ['./goods-receipt-po-list.page.scss'],
 })
-export class GoodsReceiptPoListPage implements OnInit {
-   heading:string = 'Goods Receipt List Page';
-   isBack: boolean = true;
-   searchText:any;
-   goodsReceiptList:any = [];
-   page:number = 1;
-   isEnableInfiniteScroll: boolean = true;
-   scanText:any;
+export class GoodsReceiptPoListPage {
+  heading: string = 'Goods Receipt List Page';
+  isBack: boolean = true;
+  searchText: any;
+  goodsReceiptList: any = [];
+  page: number = 1;
+  isEnableInfiniteScroll: boolean = true;
+  scanText: any;
   constructor(
     private navCtrl: NavController,
     private goodsReceiptDataService: GoodsReceiptDataService,
     private uiProvider: UiProviderService
-  ) { 
+  ) {
     this.getReceiptPurchseOrderList();
   }
 
-  ngOnInit() {
-  };
-
   onPullRefresh(event: any) {
+    this.getReceiptPurchseOrderList();
     setTimeout(() => {
-      this.getReceiptPurchseOrderList();
       event.target.complete();
     }, 2000);
 
   };
-  
+
   async getReceiptPurchseOrderList() {
     try {
       const response = await this.goodsReceiptDataService.getReceiptPurchaseOrdersListFromDB(this.searchText, this.page);
@@ -46,12 +43,10 @@ export class GoodsReceiptPoListPage implements OnInit {
       };
       this.goodsReceiptList = [...this.goodsReceiptList, ...response];
     } catch (error) {
-      console.log(error);
-    }     
+      console.error(error);
+    }
   }
 
-  // toggleSearch() {
-  // }
 
   async scanPONumber(event: any) {
     try {
@@ -63,47 +58,48 @@ export class GoodsReceiptPoListPage implements OnInit {
       this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEMS_PAGE, { queryParams: selectPurchaseOrder[0] });
 
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
-  goBackToPreviousPage (){
+  goBackToPreviousPage() {
     this.navCtrl.navigateBack(ROUTE_PATHS.DASH_BOARD);
   }
 
-  goToGoodsItemsPage(selectPurchaseOrder: any){
-    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEMS_PAGE, {queryParams:selectPurchaseOrder});
+  goToGoodsItemsPage(selectPurchaseOrder: any) {
+    const params = selectPurchaseOrder;
+    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEMS_PAGE, { queryParams: selectPurchaseOrder });
   }
 
-  clearSearchItem () {
+  clearSearchItem() {
     this.searchText = '';
     this.reInitializeInfiniteScroll();
   }
 
-  getsearchItems(event:any) {
+  getsearchItems(event: any) {
     this.searchText = event.target.value;
     this.reInitializeInfiniteScroll();
   }
 
- 
+
 
   reInitializeInfiniteScroll() {
-		console.log('Infinite Scroll has reinitialized');
-		this.page = 1;
-		this.goodsReceiptList = [];
-		this.isEnableInfiniteScroll = true;
-		this.getReceiptPurchseOrderList();
-	};
+    console.log('Infinite Scroll has reinitialized');
+    this.page = 1;
+    this.goodsReceiptList = [];
+    this.isEnableInfiniteScroll = true;
+    this.getReceiptPurchseOrderList();
+  };
 
-  onIonInfinite(event:any) {
-		console.log('Infinite Scroll has started');
-		this.page = this.page + 1;
-		this.getReceiptPurchseOrderList();
-		setTimeout(() => {
-			(event as InfiniteScrollCustomEvent).target.complete();
-			console.log('Infinite Scroll has ended');
-		}, 500);
-	}
+  onIonInfinite(event: any) {
+    console.log('Infinite Scroll has started');
+    this.page = this.page + 1;
+    this.getReceiptPurchseOrderList();
+    setTimeout(() => {
+      (event as InfiniteScrollCustomEvent).target.complete();
+      console.log('Infinite Scroll has ended');
+    }, 500);
+  }
 
 
 }

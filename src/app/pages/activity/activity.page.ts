@@ -10,7 +10,7 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
   templateUrl: './activity.page.html',
   styleUrls: ['./activity.page.scss'],
 })
-export class ActivityPage implements OnInit {
+export class ActivityPage {
   heading: string = 'Activity Page';
   isDeltaSync: boolean = true;
   resultArray: any[] = [];
@@ -28,16 +28,15 @@ export class ActivityPage implements OnInit {
 
   }
   ionViewDidEnter() {
-    this.getSyncAllAPIs()
+    this.syncAllAPIs()
   }
-  ngOnInit() {
-  }
+
   logOut() {
     this.uiProvider.showConfirmation(ROUTE_PATHS.LOGIN,MESSAGE.LOGOUT, '', CONFIRM_MESSAGES.LOG_OUT);
   };
 
-  async getSyncAllAPIs() {
-    const promiseArray = await this.syncDataService.getSync(false);
+  async syncAllAPIs() {
+    const promiseArray = await this.syncDataService.sync(false);
     let navigate = true;
     for (const { presentApi, apimessage } of promiseArray) {
       try {
@@ -56,17 +55,17 @@ export class ActivityPage implements OnInit {
       }
     }
     if(navigate) {
-      this.navCtrl.navigateForward('dashboard')
-    } else {
+      this.navCtrl.navigateForward(ROUTE_PATHS.DASHBOARD);
+      return;
+    } 
       this.displaySyncAgain = true;
-    }
   }
   async presentLoadingCard(message: any) {
     const loading = await this.uiProvider.loadingCard(message);
     const loadingCard = {
       loading,
       status: 'loading',
-      message: `${message}`,
+      message,
       translucent: true,
       cssClass: 'slide-in-from-right',
     };
@@ -83,6 +82,6 @@ export class ActivityPage implements OnInit {
 
   syncAgain () {
     this.displaySyncAgain = false;
-    this.getSyncAllAPIs();
+    this.syncAllAPIs();
   }
 }

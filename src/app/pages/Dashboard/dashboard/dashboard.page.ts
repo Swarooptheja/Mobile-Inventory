@@ -9,7 +9,7 @@ import { OfflineDataService } from 'src/app/providers/offline/offline-data.servi
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage {
   heading: string = 'Dashboard';
   isHome: boolean = false;
   isMenu: boolean = true;
@@ -28,13 +28,7 @@ export class DashboardPage implements OnInit {
 
   }
 
-  ngOnInit() {
-
-  }
   ionViewWillEnter() {
-    this.storage.get('userDetails').then((userDetails) => {
-      this.userDetails = userDetails;
-    })
     this.loadGoodReceiptCount();
   }
 

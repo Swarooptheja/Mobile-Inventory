@@ -200,9 +200,11 @@ export const RESPONSIBILITIES = {
   GOODS_RECEIPT_DOCS_RECEIVING: 'GOODS_RECEIPT_DOCS_RECEIVING',
   SERIALS: 'SERIALS',
   LOT: 'LOT'
-
-
 };
+
+export const RESPONSIBILITY = {
+    GOODS_RECEIPTS: 'GOODS RECEIPTS'
+}
 
 export const TYPE_OF_APIS = {
     REGULAR: 'REGULAR',
@@ -245,7 +247,8 @@ export const ROUTE_PATHS={
     GOODS_RECEIPT_ITEMS_PAGE:'goods-receipt-items',
     GOODS_RECEIPT_ITEM_DETAILS_PAGE:'goods-receipt-item-details',
     COMMON_MODEL: 'common-model',
-    TRANSACTION_HISTORY: 'transaction-history'
+    TRANSACTION_HISTORY: 'transaction-history',
+    DASHBOARD: 'dashboard'
 };
 
 export const CONSTANTS = {
@@ -310,4 +313,11 @@ export enum POST_TRANSACTION_DESTINATIONS {
     RECEIVING = 'Receiving',
     INVENTORY = 'Inventory'
 };
+
+export const STORAGE_KEYS = {
+    userDetails: 'userDetails',
+    userName: 'username',
+    invOrgId: 'invOrgId',
+    inventoryOrgCode: 'inventoryOrgCode'
+}
 

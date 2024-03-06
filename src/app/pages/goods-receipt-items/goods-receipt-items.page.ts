@@ -16,7 +16,7 @@ export class GoodsReceiptItemsPage implements OnInit {
   isBack: boolean = true;
   searchText: string = '';
   selectedPurchaseOrder: any;
-  receiptPurchaseOrderItems:any =[];
+  receiptPurchaseOrderItems: any = [];
   scanText: string = '';
 
   constructor(
@@ -25,11 +25,11 @@ export class GoodsReceiptItemsPage implements OnInit {
     private goodsReceiptDataService: GoodsReceiptDataService,
     private uiProvider: UiProviderService
   ) {
-    this.route.queryParams.subscribe((params:any)=>{
+    this.route.queryParams.subscribe((params: any) => {
       this.selectedPurchaseOrder = params;
     });
   }
-  
+
   ngOnInit() {
     this.getReceiptPurchaseOrderItems();
   }
@@ -40,8 +40,8 @@ export class GoodsReceiptItemsPage implements OnInit {
   }
 
   onPullRefresh(event: any) {
+    this.getReceiptPurchaseOrderItems();
     setTimeout(() => {
-      this.getReceiptPurchaseOrderItems();
       event.target.complete();
     }, 3000);
 
@@ -58,7 +58,7 @@ export class GoodsReceiptItemsPage implements OnInit {
       // let selectedPoLineItem = this.receiptPurchaseOrderItems[index];
       this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEM_DETAILS_PAGE, {
         queryParams: {
-          selectedPoLineItem: selectedPoLineItem[0], 
+          selectedPoLineItem: selectedPoLineItem[0],
           // selectedIndex: index,
           // receiptPurchaseOrderItems: this.receiptPurchaseOrderItems
         }
@@ -73,9 +73,9 @@ export class GoodsReceiptItemsPage implements OnInit {
     try {
       const purchseOrderItems = await this.goodsReceiptDataService.getReceiptPurchaseOrdersItemsFromDB(this.selectedPurchaseOrder.PoHeaderId, this.selectedPurchaseOrder.PoReleaseId, this.selectedPurchaseOrder.ShipmentHeaderId, this.selectedPurchaseOrder.RMANumber)
       this.receiptPurchaseOrderItems = purchseOrderItems;
-      console.log(this.receiptPurchaseOrderItems,"receipt purchaseorderitems")
+      console.log(this.receiptPurchaseOrderItems, "receipt purchaseorderitems")
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   goBackToPreviousPage() {
@@ -91,11 +91,14 @@ export class GoodsReceiptItemsPage implements OnInit {
   }
 
 
-  goToGoodsReceiptItemDetails(receiptPurchseOrderItem:any, index:number) {
+  goToGoodsReceiptItemDetails(receiptPurchseOrderItem: any, index: number) {
     let selectedPoLineItem = this.receiptPurchaseOrderItems[index];
-    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEM_DETAILS_PAGE, {queryParams:{selectedPoLineItem,selectedIndex:index,
-		receiptPurchaseOrderItems: this.receiptPurchaseOrderItems
-    }});
+    this.navCtrl.navigateForward(ROUTE_PATHS.GOODS_RECEIPT_ITEM_DETAILS_PAGE, {
+      queryParams: {
+        selectedPoLineItem, selectedIndex: index,
+        receiptPurchaseOrderItems: this.receiptPurchaseOrderItems
+      }
+    });
   }
 
 

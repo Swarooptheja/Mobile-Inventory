@@ -18,7 +18,7 @@ export class TransactionhistoryService {
       const allTransactionData = await this.offlineDataService.executeQueryWithoutParams(query);
       return allTransactionData
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 
