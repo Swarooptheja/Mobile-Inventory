@@ -9,6 +9,7 @@ import { NetworkproviderService } from 'src/app/providers/network/networkprovide
 import { OfflineDataService } from 'src/app/providers/offline/offline-data.service';
 import { firstValueFrom } from 'rxjs';
 import { SyncDataService } from 'src/app/providers/All-apis/sync-data.service';
+import { Header } from 'src/app/components/header/header';
 
 interface ApiData<T> {
   [key: string]: T
@@ -23,7 +24,7 @@ interface localApiData extends ApiData<any> {
   styleUrls: ['./goods-receipt-item-details.page.scss'],
 })
 export class GoodsReceiptItemDetailsPage {
-  heading: string = 'Item Details Page'
+  heading: string = Header.GOODS_RECEIPT_ITEM_DETAILS_PAGE;
   isBack: boolean = true;
   poSubItemDetails: any;
   index: number = 0;
@@ -152,7 +153,7 @@ export class GoodsReceiptItemDetailsPage {
         : purchaseOrderItem.QtyRemaining;
 
       if (this.networkService.isOnline()) {
-        const response = await this.goodReceiptService.postGoodsReceiptTransaction();
+        const response = await this.goodReceiptService.postGoodsReceiptTransaction('Online', currentPurchaseOrderItem);
         const result = await Promise.all(response);
         result.forEach(async (res: any) => {
           if (res.result === 'Success') {

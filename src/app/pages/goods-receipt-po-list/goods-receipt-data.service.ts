@@ -255,7 +255,8 @@ export class GoodsReceiptDataService {
       responsibilityId: '20634',
       inventoryOrgId: this.globalVar.getInvOrgId(),
       QtyRemaining: parseInt(item?.QTY, 10) ? (item.QtyRemaining - parseInt(item.QTY, 10)) : item.QtyRemaining,
-      Responsibility: responsibility
+      Responsibility: responsibility,
+      ShipmentLineId:item.ShipmentLineId
     });
   };
 
@@ -271,12 +272,12 @@ export class GoodsReceiptDataService {
     }
   };
 
-  async postGoodsReceiptTransaction() {
+  async postGoodsReceiptTransaction(mode: any, currentPurchaseOrderItem:any = {}) {
     try {
       // const userDetails = await this.globalVar.getUserDetails();
       // const responsibility = userDetails.find((resp: any) => resp.RESPONSIBILITY === Responsibility);
       // if(responsibility) {
-      const transactionHistoryData = await this.getDataFromTransactionHistory();
+      const transactionHistoryData = await this.getDataFromTransactionHistory(mode, currentPurchaseOrderItem);
       const localTransactions = transactionHistoryData.filter((transaction: any) => transaction.status === 'local');
       if (localTransactions.length) {
         const payload = this.goodsReceiptPayload(localTransactions);
@@ -299,10 +300,23 @@ export class GoodsReceiptDataService {
     }
   }
 
-  async getDataFromTransactionHistory(): Promise<any> {
+  async getDataFromTransactionHistory(mode: any, currentPurchaseOrderItem: any = {}): Promise<any> {
     try {
-      const query = QUERIES.TRANSACTION_HISTORY.GET;
-      const allTransactionData = await this.offlineDataService.executeQueryWithoutParams(query);
+      let query;
+      let allTransactionData;
+      if(mode === 'Online') {
+        query = QUERIES.TRANSACTION_HISTORY.GET_CURRENT_ITEM;
+        const params: any =[
+          currentPurchaseOrderItem.OrderLineId,
+          currentPurchaseOrderItem.PoLineLocationId,
+          currentPurchaseOrderItem.ShipmentLineId
+        ]
+       
+        allTransactionData = await this.offlineDataService.executeQueryWithParams(query, params);
+      } else {
+        query = QUERIES.TRANSACTION_HISTORY.GET;
+        allTransactionData = await this.offlineDataService.executeQueryWithoutParams(query);
+      }
       return allTransactionData
     } catch (error) {
       console.error(error);
@@ -324,7 +338,7 @@ export class GoodsReceiptDataService {
                   transaction.ReceiptNumber,
                   transaction.Message,
                   transaction.RecordStatus,
-                  item.id
+                  item.id                                                                                                               
                 ]
                 this.updateTransactionHistory(params);
                 resolve({

@@ -298,7 +298,8 @@ export const QUERIES = {
     TRANSACTION_HISTORY: {
         GET: `SELECT * FROM ${TABLE_NAME.TRANSCTION_TABLE_RECEIPT}`,
         DELETE: `DELETE FROM ${TABLE_NAME.TRANSCTION_TABLE_RECEIPT} WHERE id = ?`,
-        UPDATE: `UPDATE ${TABLE_NAME.TRANSCTION_TABLE_RECEIPT} SET  receiptInfo = ?, error = ?, status = ? WHERE id = ?`
+        UPDATE: `UPDATE ${TABLE_NAME.TRANSCTION_TABLE_RECEIPT} SET  receiptInfo = ?, error = ?, status = ? WHERE id = ?`,
+        GET_CURRENT_ITEM: `SELECT * FROM ${TABLE_NAME.TRANSCTION_TABLE_RECEIPT} WHERE OrderLineId=? AND PoLineLocationId=? AND ShipmentLineId=?`
     }
 
 };

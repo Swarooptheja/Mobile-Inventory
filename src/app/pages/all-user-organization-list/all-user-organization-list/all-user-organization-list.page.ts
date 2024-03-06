@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { Header } from 'src/app/components/header/header';
 import { ERROR_MESSAGE, ROUTE_PATHS, TABLE_NAME } from 'src/app/constants/pages/App-settings';
 import { GlobalvariablesService } from 'src/app/providers/globalvariables/globalvariables.service';
 import { OfflineDataService } from 'src/app/providers/offline/offline-data.service';
@@ -12,7 +13,7 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
 })
 export class AllUserOrganizationListPage {
   userDetails: any;
-  heading: string = 'Select Organization';
+  heading: Header = Header.SELECT_ORGANIZATION;
   organizationList: any;
   selectedOrgCode: string = '';
   isBack: boolean = false;

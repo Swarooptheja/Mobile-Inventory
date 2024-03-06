@@ -4,6 +4,7 @@ import { CONSTANTS, ERROR_MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/A
 import { GoodsReceiptDataService } from './goods-receipt-data.service';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
+import { Header } from 'src/app/components/header/header';
 
 @Component({
   selector: 'app-goods-receipt-po-list',
@@ -11,7 +12,7 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
   styleUrls: ['./goods-receipt-po-list.page.scss'],
 })
 export class GoodsReceiptPoListPage {
-  heading: string = 'Goods Receipt List Page';
+  heading: string = Header.GOODS_RECEIPT_LIST_PAGE;
   isBack: boolean = true;
   searchText: any;
   goodsReceiptList: any = [];

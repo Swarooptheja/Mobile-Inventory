@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NavController, LoadingController, IonContent } from '@ionic/angular';
+import { Header } from 'src/app/components/header/header';
 import { API_CALLS_MESSAGES, CONFIRM_MESSAGES, MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { MasterApiDataService } from 'src/app/providers/All-apis/master-api-data.service';
 import { SyncDataService } from 'src/app/providers/All-apis/sync-data.service';
@@ -11,7 +12,7 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
   styleUrls: ['./activity.page.scss'],
 })
 export class ActivityPage {
-  heading: string = 'Activity Page';
+  heading: Header = Header.ACTIVITY_PAGE;
   isDeltaSync: boolean = true;
   resultArray: any[] = [];
   loadingCard: any;

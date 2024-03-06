@@ -7,6 +7,7 @@ import { OfflineDataService } from 'src/app/providers/offline/offline-data.servi
 import { NetworkproviderService } from 'src/app/providers/network/networkprovider.service';
 import { GoodsReceiptDataService } from '../goods-receipt-po-list/goods-receipt-data.service';
 import { firstValueFrom } from 'rxjs';
+import { Header } from 'src/app/components/header/header';
 
 @Component({
   selector: 'app-transaction-history',
@@ -14,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./transaction-history.page.scss'],
 })
 export class TransactionHistoryPage implements OnInit {
-  heading: string = 'Transaction History';
+  heading: string = Header.TRANSACTION_HISTORY;
   isBack: boolean = true;
   transactionData:any = [];
   isOnline: any;
@@ -36,8 +37,11 @@ export class TransactionHistoryPage implements OnInit {
     // this.netWorkProvider.eventIsUserOnline.subscribe((isOnline: any)=>{
     //   this.isOnline = isOnline;
     // })
-    if(this.netWorkProvider.isOnline() && this.transactionData.length) {
-      this.isSync = true;
+    if (this.netWorkProvider.isOnline() && this.transactionData.length) {
+      const pendingTransactions = this.transactionData.find((resp: any) => resp.status === 'local');
+      if (pendingTransactions) {
+        this.isSync = true;
+      }
     } 
   }
 
@@ -90,93 +94,115 @@ export class TransactionHistoryPage implements OnInit {
   async syncData () {
     try {
       this.uiprovider.getCustomLoader(MESSAGE.SYNC_TRANSACTION_HISTORY);
-      const transactionHistoryData = await this.transactionHistoryService.getAllTransactionData();
-      this.transactionData = transactionHistoryData;
+      const response = await this.goodsReceiptService.postGoodsReceiptTransaction('Transaction History');
+      const result = await Promise.all(response);
 
-      const localTransactions = transactionHistoryData.filter((transaction: any) => transaction.status === 'local');
+      result.forEach(async (res: any) => {
+        if (res.result === 'Success') {
+          this.uiprovider.dismissLoader();
+          this.uiprovider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+          await this.goodsReceiptService.performDeltaSyncOperation();
+          this.uiprovider.dismissSuccess();
+          return;
+        } else if (res.result === 'Error') {
+          this.uiprovider.dismissLoader();
+          this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
+          await this.uiprovider.dismissSuccess();
+          return;
+        } else {
+          this.uiprovider.dismissLoader();
+          this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
+        }
 
-      if(localTransactions.length) {
-        const payloads = this.goodsReceiptService.goodsReceiptPayload(localTransactions);
+      });
+      this.onPullRefresh(null);
+      // const transactionHistoryData = await this.transactionHistoryService.getAllTransactionData();
+      // this.transactionData = transactionHistoryData;
+
+      // const localTransactions = transactionHistoryData.filter((transaction: any) => transaction.status === 'local');
+
+      // if(localTransactions.length) {
+      //   const payloads = this.goodsReceiptService.goodsReceiptPayload(localTransactions);
 
 
-        const response:any = await firstValueFrom(this.goodsReceiptService.performPostOperation(payloads));
-        if(response) {
-          this.handleResponse(response, localTransactions);
+      //   const response:any = await firstValueFrom(this.goodsReceiptService.performPostOperation(payloads));
+      //   if(response) {
+      //     this.handleResponse(response, localTransactions);
           
-        };
+      //   };
     
-      }
-      else {
-        await this.uiprovider.dismissLoader();
-        this.uiprovider.showError(ERROR_MESSAGE.NO_PENDING_TRANSACTIONS);
-      }
-      this.uiprovider.dismissLoader();
+      // }
+      // else {
+      //   await this.uiprovider.dismissLoader();
+      //   this.uiprovider.showError(ERROR_MESSAGE.NO_PENDING_TRANSACTIONS);
+      // }
+      // this.uiprovider.dismissLoader();
     } catch (error) {
       console.error(error);
       
     }
   }
 
-  handleResponse (response: any, localTransactions: any) {
-    if(response && response['Response']) {
-      const Response = response['Response'];
+  // handleResponse (response: any, localTransactions: any) {
+  //   if(response && response['Response']) {
+  //     const Response = response['Response'];
 
-      localTransactions.forEach(async(item: any)=>{
-        const transaction = Response.find((res:any)=> res.PoLineLocationId === item.PoLineLocationId);
-        if(transaction && transaction.RecordStatus === 'S') {
-          this.uiprovider.dismissLoader();
-          this.uiprovider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
-          const params = [
-            transaction.ReceiptNumber,
-            transaction.Message,
-            transaction.RecordStatus,
-            item.id
-          ]
-           this.updateTransactionHistory(params)
-        } else if(transaction && transaction.RecordStatus === 'E') {
-          this.uiprovider.dismissLoader();
-          this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
-          const params = [
-            transaction.ReceiptNumber,
-            transaction.Message,
-            transaction.RecordStatus,
-            item.id
-          ];
-          const updateQtyParams = [
-            parseInt(transaction.QTY) + transaction.QtyRemaining,
-            transaction.OrderLineId,
-            transaction.PoLineLocationId,
-            transaction.ShipmentLineId
-          ];
-           this.updateTransactionHistory(params);
-           this.updateQtyRemaining(updateQtyParams)
+  //     localTransactions.forEach(async(item: any)=>{
+  //       const transaction = Response.find((res:any)=> res.PoLineLocationId === item.PoLineLocationId);
+  //       if(transaction && transaction.RecordStatus === 'S') {
+  //         this.uiprovider.dismissLoader();
+  //         this.uiprovider.showSuccess(MESSAGE.TRANSACTION_SUCCESS);
+  //         const params = [
+  //           transaction.ReceiptNumber,
+  //           transaction.Message,
+  //           transaction.RecordStatus,
+  //           item.id
+  //         ]
+  //          this.updateTransactionHistory(params)
+  //       } else if(transaction && transaction.RecordStatus === 'E') {
+  //         this.uiprovider.dismissLoader();
+  //         this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
+  //         const params = [
+  //           transaction.ReceiptNumber,
+  //           transaction.Message,
+  //           transaction.RecordStatus,
+  //           item.id
+  //         ];
+  //         const updateQtyParams = [
+  //           parseInt(transaction.QTY) + transaction.QtyRemaining,
+  //           transaction.OrderLineId,
+  //           transaction.PoLineLocationId,
+  //           transaction.ShipmentLineId
+  //         ];
+  //          this.updateTransactionHistory(params);
+  //          this.updateQtyRemaining(updateQtyParams)
            
-        }
-        else {
-          this.uiprovider.dismissLoader();
-          this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
-        }
-      });
-      this.onPullRefresh(null);
-    }
-  };
+  //       }
+  //       else {
+  //         this.uiprovider.dismissLoader();
+  //         this.uiprovider.showError(MESSAGE.TRANSACTION_FAILED);
+  //       }
+  //     });
+  //     this.onPullRefresh(null);
+  //   }
+  // };
 
-   updateTransactionHistory (params: any) {
-    try {
-      this.offlineDataService.updateQuery(QUERIES.TRANSACTION_HISTORY.UPDATE, params)
-    } catch (error) {
-      console.error(error);   
-    }
+  //  updateTransactionHistory (params: any) {
+  //   try {
+  //     this.offlineDataService.updateQuery(QUERIES.TRANSACTION_HISTORY.UPDATE, params)
+  //   } catch (error) {
+  //     console.error(error);   
+  //   }
 
-  }
-  updateQtyRemaining (params: any) {
-    try {
-      const query = QUERIES.GOODS_RECEIPT.UPDATE_QTY_REMAINING;
-      this.offlineDataService.updateQuery(query,params);
-    } catch (error) {
-      console.error(error);  
-    }
-  }
+  // }
+  // updateQtyRemaining (params: any) {
+  //   try {
+  //     const query = QUERIES.GOODS_RECEIPT.UPDATE_QTY_REMAINING;
+  //     this.offlineDataService.updateQuery(query,params);
+  //   } catch (error) {
+  //     console.error(error);  
+  //   }
+  // }
 
  
 

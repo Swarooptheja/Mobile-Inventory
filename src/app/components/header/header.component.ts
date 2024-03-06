@@ -1,5 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Header } from './header';
 
+
+// export enum HEADER_TEXT {
+//   DASHBAORD = 'Dashboard',
+//   SELECT_ORG = 'Select Organization'
+// }
 
 @Component({
   selector: 'app-header',
@@ -7,7 +13,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent  implements OnInit {
-  @Input('heading') heading :string = '';
+  @Input('heading') heading : string = '';
   @Input('isBack') isBack: boolean = false;
   @Input('isHome') isHome: boolean = false;
   @Input('isMenu') isMenu: boolean = false;

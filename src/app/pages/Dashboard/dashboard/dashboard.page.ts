@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { Storage } from '@ionic/storage';
+import { Header } from 'src/app/components/header/header';
 import { QUERIES, ROUTE_PATHS } from 'src/app/constants/pages/App-settings';
 import { OfflineDataService } from 'src/app/providers/offline/offline-data.service';
 
@@ -10,7 +11,7 @@ import { OfflineDataService } from 'src/app/providers/offline/offline-data.servi
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage {
-  heading: string = 'Dashboard';
+  heading: string = Header.DASH_BOARD;
   isHome: boolean = false;
   isMenu: boolean = true;
   userDetails: any;

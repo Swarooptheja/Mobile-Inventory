@@ -49,7 +49,8 @@ export const GOODS_RECEIPT_QUERIES = {
             responsibilityId TEXT,
             inventoryOrgId TEXT,
             QtyRemaining TEXT,
-            Responsibility TEXT
+            Responsibility TEXT,
+            ShipmentLineId TEXT
             )`,
     }
 }

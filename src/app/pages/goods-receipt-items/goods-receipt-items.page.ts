@@ -5,6 +5,7 @@ import { ERROR_MESSAGE, ROUTE_PATHS } from 'src/app/constants/pages/App-settings
 import { ActivatedRoute } from '@angular/router';
 import { GoodsReceiptDataService } from '../goods-receipt-po-list/goods-receipt-data.service';
 import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
+import { Header } from 'src/app/components/header/header';
 @Component({
   selector: 'app-goods-receipt-items',
   templateUrl: './goods-receipt-items.page.html',
@@ -12,7 +13,7 @@ import { UiProviderService } from 'src/app/providers/ui/ui-provider.service';
 })
 export class GoodsReceiptItemsPage implements OnInit {
 
-  heading: string = 'Goods Receipt Items Page';
+  heading: string = Header.GOODS_RECEIPT_ITEMS_PAGE;
   isBack: boolean = true;
   searchText: string = '';
   selectedPurchaseOrder: any;
